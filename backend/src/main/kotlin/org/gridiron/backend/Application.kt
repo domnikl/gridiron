@@ -30,6 +30,9 @@ fun Application.module() {
     }
 
     install(DefaultHeaders)
+    install(CORS) {
+        anyHost()
+    }
     install(CallLogging)
     install(Compression)
     install(StatusPages) {
