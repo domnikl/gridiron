@@ -20,6 +20,11 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-jackson:$ktorVersion")
     implementation("io.ktor:ktor-auth-jwt:$ktorVersion")
+    implementation("org.mariadb.jdbc:mariadb-java-client:2.6.2")
+    implementation("org.jetbrains.exposed:exposed-core:0.26.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.26.1")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.26.1")
+    implementation("com.zaxxer:HikariCP:3.4.5")
     implementation("org.slf4j:slf4j-simple:1.7.30")
 }
 
