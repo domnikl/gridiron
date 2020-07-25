@@ -19,6 +19,7 @@ dependencies {
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-jackson:$ktorVersion")
+    implementation("io.ktor:ktor-auth-jwt:$ktorVersion")
     implementation("org.slf4j:slf4j-simple:1.7.30")
 }
 
