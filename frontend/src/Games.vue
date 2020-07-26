@@ -1,11 +1,13 @@
 <template>
     <div>
         <LoadingSpinner v-if="loading"></LoadingSpinner>
+        <CreateGame :show="showCreate" v-on:md-closed="showCreate = false" v-on:md-clicked-outside="showCreate = false">
+        </CreateGame>
 
         <md-table v-if="!loading" v-model="filtered" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
             <md-table-toolbar>
                 <div class="md-toolbar-section-start">
-                    <h1 class="md-title">Games</h1>
+                    <h1 class="md-title"><md-icon>sports_football</md-icon> Games</h1>
                 </div>
 
                 <md-field md-clearable class="md-toolbar-section-end">
@@ -37,6 +39,7 @@
 <script>
 import Api from '@/api.js';
 import LoadingSpinner from './components/LoadingSpinner.vue';
+import CreateGame from './components/CreateGame.vue';
 
 const toLower = (text) => text.toString().toLowerCase()
 
@@ -50,13 +53,14 @@ const searchByTeams = (items, term) => {
 
 export default {
   name: 'Games',
-  components: { LoadingSpinner },
+  components: { LoadingSpinner, CreateGame },
   data: () => ({
     loading: true,
     games: [],
     filtered: [],
     search: '',
     error: null,
+    showCreate: false,
   }),
   created() {
     this.fetchData();
@@ -84,7 +88,7 @@ export default {
       this.loading = false;
     },
     create() {
-      console.log('create clicked')
+      this.showCreate = true
     },
   },
 };
