@@ -31,7 +31,7 @@
 import Api from '@/api.js';
 
 export default {
-  name: 'app',
+  name: 'Teams',
   data: () => ({
     loading: false,
     teams: [],

@@ -43,7 +43,9 @@
       "@vue/airbnb"
     ],
     "rules": {
-      "no-param-reassign": "off"
+      "no-param-reassign": "off",
+      "max-len": "off",
+      "semi": "off"
     },
     "parserOptions": {
       "parser": "babel-eslint"

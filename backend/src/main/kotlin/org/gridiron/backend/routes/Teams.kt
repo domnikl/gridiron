@@ -7,9 +7,9 @@ import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
-import org.gridiron.backend.Team
-import org.gridiron.backend.TeamAlreadyExistsException
-import org.gridiron.backend.TeamRepository
+import org.gridiron.backend.model.Team
+import org.gridiron.backend.model.TeamAlreadyExistsException
+import org.gridiron.backend.model.TeamRepository
 
 fun Route.teams(teamRepository: TeamRepository) {
     get("/teams") {

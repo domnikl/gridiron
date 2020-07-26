@@ -1,20 +1,28 @@
 package org.gridiron.backend
 
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.joda.JodaModule
 import io.ktor.application.Application
+import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.auth.Authentication
 import io.ktor.auth.jwt.jwt
 import io.ktor.features.*
 import io.ktor.http.CacheControl
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.CachingOptions
 import io.ktor.jackson.jackson
+import io.ktor.response.respond
 import io.ktor.routing.routing
 import io.ktor.sessions.Sessions
 import io.ktor.sessions.cookie
 import io.ktor.util.KtorExperimentalAPI
+import org.gridiron.backend.persistence.Games
+import org.gridiron.backend.persistence.Teams
 import org.gridiron.backend.routes.auth
+import org.gridiron.backend.routes.games
 import org.gridiron.backend.routes.teams
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -26,7 +34,7 @@ fun Application.module() {
     val cookieName = "SESSION"
 
     transaction(factory.db) {
-        SchemaUtils.createMissingTablesAndColumns(Teams)
+        SchemaUtils.createMissingTablesAndColumns(Teams, Games)
     }
 
     install(DefaultHeaders)
@@ -36,11 +44,15 @@ fun Application.module() {
     install(CallLogging)
     install(Compression)
     install(StatusPages) {
-        // TODO: configure
+        /*exception<Exception> { cause ->
+            call.respond(HttpStatusCode.InternalServerError, mapOf("message" to cause.message))
+        }*/
     }
     install(ContentNegotiation) {
         jackson {
+            registerModule(JodaModule())
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         }
     }
     install(CachingHeaders) {
@@ -65,5 +77,6 @@ fun Application.module() {
     routing {
         auth(jwtAuthentication, cookieName)
         teams(factory.teamRepository)
+        games(factory.gameRepository, factory.teamRepository)
     }
 }

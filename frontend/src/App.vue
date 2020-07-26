@@ -17,6 +17,10 @@
                         <md-icon>move_to_inbox</md-icon>
                         <span class="md-list-item-router">Dashboard</span>
                     </md-list-item>
+                    <md-list-item to="/games">
+                        <md-icon>sports_football</md-icon>
+                        <span class="md-list-item-router">Games</span>
+                    </md-list-item>
                     <md-list-item to="/teams">
                         <md-icon>people</md-icon>
                         <span class="md-list-item-router">Teams</span>
@@ -41,5 +45,8 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.md-app {
+    height: 100vh;
+}
 </style>
