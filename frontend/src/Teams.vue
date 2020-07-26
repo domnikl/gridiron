@@ -2,8 +2,27 @@
     <div>
         <h1>Teams</h1>
 
-        <div v-for="team in teams" :key="team.uuid">
-            {{ team.name }}
+        <div class="md-layout md-gutter md-alignment-center">
+            <div class="md-layout-item md-medium-size-33 md-small-size-50 md-xsmall-size-100"
+                 v-for="team in teams" :key="team.uuid">
+                <md-card md-with-hover>
+                    <md-ripple>
+                        <md-card-header>
+                            <div class="md-title">{{team.name}}</div>
+                            <div class="md-subhead">Football Team</div>
+                        </md-card-header>
+
+                        <!--<md-card-content>
+                            This is some content
+                        </md-card-content>
+
+                        <md-card-actions>
+                            <md-button>Action</md-button>
+                            <md-button>Action</md-button>
+                        </md-card-actions>-->
+                    </md-ripple>
+                </md-card>
+            </div>
         </div>
     </div>
 </template>
@@ -42,5 +61,8 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.md-card {
+    height: 120px;
+}
 </style>

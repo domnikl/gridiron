@@ -1,15 +1,33 @@
 <template>
-    <div id="app">
-        <h1>Gridiron</h1>
+    <div class="page-container">
+        <md-app md-mode="fixed">
+            <md-app-toolbar class="md-primary">
+                <md-button class="md-icon-button" @click="menuVisible = !menuVisible">
+                    <md-icon>menu</md-icon>
+                </md-button>
 
-        <p>
-            <ul>
-                <li><router-link to="/">Dashboard</router-link></li>
-                <li><router-link to="/teams">Teams</router-link></li>
-            </ul>
-        </p>
+                <span class="md-title">Gridiron</span>
+            </md-app-toolbar>
 
-        <router-view></router-view>
+            <md-app-drawer :md-active.sync="menuVisible">
+                <md-toolbar class="md-transparent" md-elevation="0">Navigation</md-toolbar>
+
+                <md-list>
+                    <md-list-item to="/">
+                        <md-icon>move_to_inbox</md-icon>
+                        <span class="md-list-item-router">Dashboard</span>
+                    </md-list-item>
+                    <md-list-item to="/teams">
+                        <md-icon>people</md-icon>
+                        <span class="md-list-item-router">Teams</span>
+                    </md-list-item>
+                </md-list>
+            </md-app-drawer>
+
+            <md-app-content>
+                <router-view></router-view>
+            </md-app-content>
+        </md-app>
     </div>
 </template>
 
@@ -17,6 +35,9 @@
 
 export default {
   name: 'app',
+  data: () => ({
+    menuVisible: false,
+  }),
 };
 </script>
 
