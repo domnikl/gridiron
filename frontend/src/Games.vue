@@ -24,7 +24,7 @@
             <md-table-row slot="md-table-row" slot-scope="{ item }">
                 <md-table-cell md-label="Team">{{ item.team1.name }}</md-table-cell>
                 <md-table-cell md-label="At">{{ item.team2.name }}</md-table-cell>
-                <md-table-cell md-label="start" md-sort-by="start">{{ item.start }}</md-table-cell>
+                <md-table-cell md-label="start" md-sort-by="start">{{ formatDateTime(item.start) }}</md-table-cell>
             </md-table-row>
         </md-table>
 
@@ -37,6 +37,7 @@
 </template>
 
 <script>
+import moment from 'moment-timezone';
 import LoadingSpinner from './components/LoadingSpinner.vue';
 import CreateGame from './components/CreateGame.vue';
 
@@ -61,7 +62,9 @@ export default {
     showCreate: false,
   }),
   computed: {
-    games: () => this.$store.state.games
+    games() {
+      return this.$store.state.games
+    },
   },
   created() {
     this.fetchData();
@@ -89,7 +92,8 @@ export default {
     afterCreated() {
       this.showCreate = false
       this.fetchData()
-    }
+    },
+    formatDateTime(e) { return moment(e).tz('Europe/Berlin').format('lll') }
   },
 };
 </script>
