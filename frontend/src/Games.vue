@@ -1,7 +1,7 @@
 <template>
     <div>
         <LoadingSpinner v-if="loading"></LoadingSpinner>
-        <CreateGame :show="showCreate" v-on:md-closed="showCreate = false" v-on:md-clicked-outside="showCreate = false">
+        <CreateGame :show="showCreate" v-on:closed="afterCreated()">
         </CreateGame>
 
         <md-table v-if="!loading" v-model="filtered" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
@@ -22,8 +22,8 @@
             </md-table-empty-state>
 
             <md-table-row slot="md-table-row" slot-scope="{ item }">
-                <md-table-cell md-label="Team" md-sort-by="team1">{{ item.team1.name }}</md-table-cell>
-                <md-table-cell md-label="At" md-sort-by="team2">{{ item.team2.name }}</md-table-cell>
+                <md-table-cell md-label="Team">{{ item.team1.name }}</md-table-cell>
+                <md-table-cell md-label="At">{{ item.team2.name }}</md-table-cell>
                 <md-table-cell md-label="start" md-sort-by="start">{{ item.start }}</md-table-cell>
             </md-table-row>
         </md-table>
@@ -61,9 +61,7 @@ export default {
     showCreate: false,
   }),
   computed: {
-    games() {
-      return this.$store.state.games
-    }
+    games: () => this.$store.state.games
   },
   created() {
     this.fetchData();
@@ -88,6 +86,10 @@ export default {
     create() {
       this.showCreate = true
     },
+    afterCreated() {
+      this.showCreate = false
+      this.fetchData()
+    }
   },
 };
 </script>

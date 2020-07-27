@@ -42,9 +42,7 @@ export default {
     error: null,
   }),
   computed: {
-    teams() {
-      return this.$store.state.teams
-    }
+    teams() { return this.$store.state.teams }
   },
   created() {
     this.fetchData();

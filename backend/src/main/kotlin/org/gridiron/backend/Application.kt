@@ -9,9 +9,7 @@ import io.ktor.application.install
 import io.ktor.auth.Authentication
 import io.ktor.auth.jwt.jwt
 import io.ktor.features.*
-import io.ktor.http.CacheControl
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
+import io.ktor.http.*
 import io.ktor.http.content.CachingOptions
 import io.ktor.jackson.jackson
 import io.ktor.response.respond
@@ -39,6 +37,18 @@ fun Application.module() {
 
     install(DefaultHeaders)
     install(CORS) {
+        method(HttpMethod.Options)
+        method(HttpMethod.Get)
+        method(HttpMethod.Post)
+        method(HttpMethod.Put)
+        method(HttpMethod.Delete)
+        method(HttpMethod.Patch)
+        header(HttpHeaders.Authorization)
+        header(HttpHeaders.Accept)
+        header(HttpHeaders.ContentType)
+        header(HttpHeaders.UserAgent)
+        header(HttpHeaders.Referrer)
+        allowCredentials = true
         anyHost()
     }
     install(CallLogging)

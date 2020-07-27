@@ -7,14 +7,14 @@
                 <md-field>
                     <label for="team1">Team 1</label>
                     <md-select v-model="team1" name="team1" id="team1">
-                        <md-option value="fight-club">Fight Club</md-option>
+                        <md-option v-for="team in teams1" :key="team.uuid" :value="team.uuid">{{team.name}}</md-option>
                     </md-select>
                 </md-field>
 
                 <md-field>
                     <label for="team2">Team 2</label>
                     <md-select v-model="team2" name="team2" id="team2">
-                        <md-option value="fight-club">Fight Club</md-option>
+                        <md-option v-for="team in teams2" :key="team.uuid" :value="team.uuid">{{team.name}}</md-option>
                     </md-select>
                 </md-field>
 
@@ -35,6 +35,8 @@
 <script>
 import { Datetime } from 'vue-datetime';
 
+const filterTeams = (teams, selected) => teams.filter((e) => selected === null || e.uuid !== selected)
+
 export default {
   name: 'CreateGame',
   props: ['show'],
@@ -43,16 +45,38 @@ export default {
     team1: null,
     team2: null,
     start: null,
-    teams: [],
   }),
+  computed: {
+    teams() { return this.$store.state.teams },
+    teams1() { return filterTeams(this.teams, this.team2); },
+    teams2() { return filterTeams(this.teams, this.team1); },
+  },
+  created() {
+    this.fetchData();
+  },
   methods: {
     close() {
-      this.$emit('md-closed')
+      this.team1 = null;
+      this.team2 = null;
+      this.start = null;
+
+      this.$emit('closed')
     },
     save() {
-      // TODO: commit to VueX store, trigger reload in background
-      this.close()
-    }
+      this.$store.dispatch('SAVE_GAME', {
+        team1: this.team1,
+        team2: this.team2,
+        start: this.start
+      }).then(() => {
+        this.close()
+      })
+    },
+    fetchData() {
+      this.loading = true;
+      this.$store.dispatch('GET_TEAMS').finally(() => {
+        this.loading = false
+      })
+    },
   },
 };
 </script>

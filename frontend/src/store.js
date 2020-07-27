@@ -39,6 +39,17 @@ const store = new Vuex.Store({
           context.commit('SET_GAMES', response.data)
         }
       });
+    },
+    SAVE_GAME(context, payload) {
+      return Api.post('/games', {
+        team1: payload.team1,
+        team2: payload.team2,
+        start: payload.start,
+      }).then((response, error) => {
+        if (error) {
+          context.commit('SET_ERROR', error.toString())
+        }
+      });
     }
   }
 })
