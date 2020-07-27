@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import Vuex from 'vuex';
 import VueRouter from 'vue-router';
 import VueMaterial from 'vue-material';
 import { Datetime } from 'vue-datetime';
@@ -11,10 +10,10 @@ import App from '@/App.vue';
 import Dashboard from '@/Dasboard.vue';
 import Teams from '@/Teams.vue';
 import Games from '@/Games.vue';
+import store from './store';
 
 Vue.use(VueMaterial);
 Vue.use(VueRouter);
-Vue.use(Vuex);
 Vue.use(Datetime);
 
 const routes = [
@@ -24,10 +23,11 @@ const routes = [
 ];
 
 const router = new VueRouter({
-  routes,
+  routes
 });
 
 new Vue({
   render: (h) => h(App),
   router,
+  store,
 }).$mount('#app');

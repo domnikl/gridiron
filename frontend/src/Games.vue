@@ -37,7 +37,6 @@
 </template>
 
 <script>
-import Api from '@/api.js';
 import LoadingSpinner from './components/LoadingSpinner.vue';
 import CreateGame from './components/CreateGame.vue';
 
@@ -56,12 +55,16 @@ export default {
   components: { LoadingSpinner, CreateGame },
   data: () => ({
     loading: true,
-    games: [],
     filtered: [],
     search: '',
     error: null,
     showCreate: false,
   }),
+  computed: {
+    games() {
+      return this.$store.state.games
+    }
+  },
   created() {
     this.fetchData();
   },
@@ -70,22 +73,17 @@ export default {
   },
   methods: {
     searchOnTable() {
-      this.filtered = searchByTeams(this.games, this.search)
+      this.filtered = searchByTeams(this.$store.state.games, this.search)
     },
     fetchData() {
       this.loading = true;
-
-      Api.get('/games').then((response, error) => {
-        if (error) {
-          this.error = error.toString();
-          this.loading = false;
-        } else {
-          this.filtered = response.data;
-          this.games = response.data;
-        }
-      });
-
-      this.loading = false;
+      this.$store.dispatch('GET_GAMES')
+        .then(() => {
+          this.searchOnTable()
+        })
+        .finally(() => {
+          this.loading = false
+        })
     },
     create() {
       this.showCreate = true

@@ -32,7 +32,6 @@
 </template>
 
 <script>
-import Api from '@/api.js';
 import LoadingSpinner from './components/LoadingSpinner.vue';
 
 export default {
@@ -40,9 +39,13 @@ export default {
   components: { LoadingSpinner },
   data: () => ({
     loading: false,
-    teams: [],
     error: null,
   }),
+  computed: {
+    teams() {
+      return this.$store.state.teams
+    }
+  },
   created() {
     this.fetchData();
   },
@@ -52,16 +55,9 @@ export default {
   methods: {
     fetchData() {
       this.loading = true;
-
-      Api.get('/teams').then((response, error) => {
-        if (error) {
-          this.error = error.toString();
-        } else {
-          this.teams = response.data;
-        }
-      });
-
-      this.loading = false;
+      this.$store.dispatch('GET_TEAMS').finally(() => {
+        this.loading = false
+      })
     },
   },
 };
