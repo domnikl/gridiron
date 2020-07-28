@@ -80,7 +80,13 @@ export default {
     ],
   }),
   computed: {
-    start() { return this.formatDateTime(`${this.startDate} ${this.startTime}`) },
+    start() {
+      if (!this.startDate || !this.startTime) {
+        return ''
+      }
+
+      return this.formatDateTime(`${this.startDate} ${this.startTime}`)
+    },
     games() { return this.$store.state.games },
     teams() { return this.$store.state.teams },
     teams1() { return filterTeams(this.teams, this.team2); },
