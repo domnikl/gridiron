@@ -9,8 +9,8 @@
                     <v-select v-model="team2" :items="teams2" item-text="name" item-value="uuid" label="Team 2 (at)"></v-select>
 
                     <v-card flat class="justify-center">
-                        <v-date-picker @change="selectDate = false; selectTime = true" v-if="selectDate" v-model="startDate" full-width></v-date-picker>
-                        <v-time-picker @change="selectTime = false" format="24hr" v-if="selectTime" v-model="startTime" full-width></v-time-picker>
+                        <v-date-picker @change="selectDate = false; selectTime = true" v-if="selectDate" v-model="startDate" full-width scrollable></v-date-picker>
+                        <v-time-picker @change="selectTime = false" format="24hr" v-if="selectTime" v-model="startTime" full-width scrollable></v-time-picker>
                     </v-card>
 
                     <div v-if="!selectDate && !selectTime">
