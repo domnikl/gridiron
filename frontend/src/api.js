@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const client = axios.create({
-  baseURL: 'http://192.168.178.52:4001', // TODO: remove hard-coded value
+  baseURL: process.env.VUE_APP_API_BASE_URL,
 });
 
 client.login = () => {

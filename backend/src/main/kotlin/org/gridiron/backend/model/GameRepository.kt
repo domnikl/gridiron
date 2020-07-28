@@ -27,7 +27,7 @@ class GameRepository(private val db: Database, private val teamRepository: TeamR
     }
 
     fun all() = transaction(db) {
-        Games.selectAll().map {
+        Games.selectAll().orderBy(start to SortOrder.ASC).map {
             Game(
                 it[uuid],
                 teamRepository.find(it[team1]),

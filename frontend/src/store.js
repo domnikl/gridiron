@@ -9,6 +9,11 @@ const store = new Vuex.Store({
     lastError: '',
     teams: [],
     games: [],
+    user: {
+      uuid: '078a0d22-c344-47b9-af4f-445f3e10ec52',
+      name: 'domnikl',
+      isAdmin: true,
+    }
   },
   mutations: {
     SET_ERROR: (state, errorMessage) => {

@@ -31,7 +31,7 @@
             </v-card>
         </v-dialog>
 
-        <v-btn color="pink" dark fixed bottom right fab @click.stop="showCreate = true">
+        <v-btn v-if="this.$store.state.user.isAdmin" color="pink" dark fixed bottom right fab @click.stop="showCreate = true">
             <v-icon>mdi-plus</v-icon>
         </v-btn>
     </div>
