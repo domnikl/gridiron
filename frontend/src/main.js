@@ -1,10 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import VueMaterial from 'vue-material';
-import { Datetime } from 'vue-datetime';
-import 'vue-material/dist/vue-material.min.css';
-import 'vue-material/dist/theme/default.css';
-import 'vue-datetime/dist/vue-datetime.css'
+import Vuetify from 'vuetify'
+import 'vuetify/dist/vuetify.min.css'
 
 import App from '@/App.vue';
 import Dashboard from '@/Dasboard.vue';
@@ -12,15 +9,16 @@ import Teams from '@/Teams.vue';
 import Games from '@/Games.vue';
 import store from './store';
 
-Vue.use(VueMaterial);
+Vue.use(Vuetify)
 Vue.use(VueRouter);
-Vue.use(Datetime);
 
 const routes = [
   { path: '/', component: Dashboard },
   { path: '/teams', component: Teams },
   { path: '/games', component: Games },
 ];
+
+const vuetify = new Vuetify({})
 
 const router = new VueRouter({
   routes
@@ -29,5 +27,6 @@ const router = new VueRouter({
 new Vue({
   render: (h) => h(App),
   router,
+  vuetify,
   store,
 }).$mount('#app');

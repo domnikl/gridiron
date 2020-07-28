@@ -1,52 +1,54 @@
 <template>
     <div class="page-container">
-        <md-app md-mode="fixed">
-            <md-app-toolbar class="md-primary">
-                <md-button class="md-icon-button" @click="menuVisible = !menuVisible">
-                    <md-icon>menu</md-icon>
-                </md-button>
+        <v-app>
+            <v-app-bar app clipped-right color="#1976d2" dark>
+                <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+                <v-toolbar-title>Gridiron</v-toolbar-title>
+            </v-app-bar>
 
-                <span class="md-title">Gridiron</span>
-            </md-app-toolbar>
+            <v-navigation-drawer v-model="drawer" app>
+                <v-list dense>
+                    <v-list-item to="/games">
+                        <v-list-item-action>
+                            <v-icon>mdi-football</v-icon>
+                        </v-list-item-action>
+                        <v-list-item-content>
+                            <v-list-item-title>Games</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item to="/teams">
+                        <v-list-item-action>
+                            <v-icon>mdi-account-group</v-icon>
+                        </v-list-item-action>
+                        <v-list-item-content>
+                            <v-list-item-title>Teams</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                </v-list>
+            </v-navigation-drawer>
 
-            <md-app-drawer :md-active.sync="menuVisible">
-                <md-toolbar class="md-transparent" md-elevation="0">Navigation</md-toolbar>
-
-                <md-list>
-                    <md-list-item to="/">
-                        <md-icon>move_to_inbox</md-icon>
-                        <span class="md-list-item-router">Dashboard</span>
-                    </md-list-item>
-                    <md-list-item to="/games">
-                        <md-icon>sports_football</md-icon>
-                        <span class="md-list-item-router">Games</span>
-                    </md-list-item>
-                    <md-list-item to="/teams">
-                        <md-icon>people</md-icon>
-                        <span class="md-list-item-router">Teams</span>
-                    </md-list-item>
-                </md-list>
-            </md-app-drawer>
-
-            <md-app-content>
-                <router-view></router-view>
-            </md-app-content>
-        </md-app>
+            <v-main>
+                <v-container fluid>
+                    <v-row justify="start" align="start">
+                        <v-col cols="12" sm="12" md="12">
+                            <router-view></router-view>
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </v-main>
+        </v-app>
     </div>
 </template>
 
 <script>
 
 export default {
-  name: 'app',
+  name: 'App',
   data: () => ({
-    menuVisible: false,
+    drawer: false,
   }),
 };
 </script>
 
 <style lang="scss" scoped>
-.md-app {
-    height: 100vh;
-}
 </style>

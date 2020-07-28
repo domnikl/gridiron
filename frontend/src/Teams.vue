@@ -1,45 +1,50 @@
 <template>
     <div>
-        <LoadingSpinner v-if="loading"></LoadingSpinner>
+        <h1><v-icon>mdi-account-group</v-icon> Teams</h1>
 
-        <div v-if="!loading">
-            <h1><md-icon>people</md-icon> Teams</h1>
+        <v-data-iterator :items="teams" :loading="loading">
+            <template v-slot:default="props">
+                <v-row>
+                    <v-col v-for="item in props.items" :key="item.uuid" cols="12" sm="6" md="4" lg="3">
+                        <v-card>
+                            <v-card-title class="subheading font-weight-bold">{{ item.name }}</v-card-title>
+                            <v-card-subtitle>Football team</v-card-subtitle>
+                        </v-card>
+                    </v-col>
+                </v-row>
+            </template>
+        </v-data-iterator>
 
-            <div class="md-layout md-gutter md-alignment-center">
-                <div class="md-layout-item md-medium-size-33 md-small-size-50 md-xsmall-size-100"
-                     v-for="team in teams" :key="team.uuid">
-                    <md-card md-with-hover>
-                        <md-ripple>
-                            <md-card-header>
-                                <div class="md-title">{{team.name}}</div>
-                                <div class="md-subhead">Football Team</div>
-                            </md-card-header>
+        <v-dialog v-model="showCreate">
+            <v-card>
+                <v-card-title class="headline">Create new team</v-card-title>
 
-                            <!--<md-card-content>
-                                This is some content
-                            </md-card-content>
+                <v-card-text>
+                    <v-text-field label="Name" v-model="name"></v-text-field>
+                </v-card-text>
 
-                            <md-card-actions>
-                                <md-button>Action</md-button>
-                                <md-button>Action</md-button>
-                            </md-card-actions>-->
-                        </md-ripple>
-                    </md-card>
-                </div>
-            </div>
-        </div>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn @click="close()" text>Close</v-btn>
+                    <v-btn @click="save()" text color="primary">Save</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <v-btn color="pink" dark fixed bottom right fab @click.stop="showCreate = true">
+            <v-icon>mdi-plus</v-icon>
+        </v-btn>
     </div>
 </template>
 
 <script>
-import LoadingSpinner from './components/LoadingSpinner.vue';
-
 export default {
   name: 'Teams',
-  components: { LoadingSpinner },
   data: () => ({
     loading: false,
     error: null,
+    showCreate: false,
+    name: '',
   }),
   computed: {
     teams() { return this.$store.state.teams }
@@ -57,12 +62,21 @@ export default {
         this.loading = false
       })
     },
+    close() {
+      this.showCreate = false;
+      this.name = null;
+    },
+    save() {
+      this.$store.dispatch('SAVE_TEAM', {
+        name: this.name,
+      }).then(() => {
+        this.fetchData()
+        this.close()
+      })
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.md-card {
-    height: 120px;
-}
 </style>

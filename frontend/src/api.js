@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const client = axios.create({
-  baseURL: 'http://localhost:4001', // TODO: remove hard-coded value
+  baseURL: 'http://192.168.178.52:4001', // TODO: remove hard-coded value
 });
 
 client.login = () => {

@@ -1,70 +1,90 @@
 <template>
     <div>
-        <LoadingSpinner v-if="loading"></LoadingSpinner>
-        <CreateGame :show="showCreate" v-on:closed="afterCreated()">
-        </CreateGame>
+        <v-dialog v-model="showCreate">
+            <v-card>
+                <v-card-title class="headline">Create new game</v-card-title>
 
-        <md-table v-if="!loading" v-model="filtered" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
-            <md-table-toolbar>
-                <div class="md-toolbar-section-start">
-                    <h1 class="md-title"><md-icon>sports_football</md-icon> Games</h1>
-                </div>
+                <v-card-text>
+                    <v-select v-model="team1" :items="teams1" item-text="name" item-value="uuid" label="Team 1"></v-select>
+                    <v-select v-model="team2" :items="teams2" item-text="name" item-value="uuid" label="Team 2 (at)"></v-select>
 
-                <md-field md-clearable class="md-toolbar-section-end">
-                    <md-input placeholder="Search by teams..." v-model="search" @input="searchOnTable" />
-                </md-field>
-            </md-table-toolbar>
+                    <v-card flat class="justify-center">
+                        <v-date-picker @change="selectDate = false; selectTime = true" v-if="selectDate" v-model="startDate" full-width></v-date-picker>
+                        <v-time-picker @change="selectTime = false" format="24hr" v-if="selectTime" v-model="startTime" full-width></v-time-picker>
+                    </v-card>
 
-            <md-table-empty-state
-                md-label="No games found"
-                :md-description="`No game found for this '${search}' query. Try a different search term.`">
-                <md-button class="md-primary md-raised">Create New Game</md-button>
-            </md-table-empty-state>
+                    <div v-if="!selectDate && !selectTime">
+                        <v-text-field @click="selectDate = true;" prepend-icon="mdi-clock" label="Date" :value="start"></v-text-field>
+                    </div>
+                </v-card-text>
 
-            <md-table-row slot="md-table-row" slot-scope="{ item }">
-                <md-table-cell md-label="Team">{{ item.team1.name }}</md-table-cell>
-                <md-table-cell md-label="At">{{ item.team2.name }}</md-table-cell>
-                <md-table-cell md-label="start" md-sort-by="start">{{ formatDateTime(item.start) }}</md-table-cell>
-            </md-table-row>
-        </md-table>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn @click="close()" text>Close</v-btn>
+                    <v-btn @click="save()" text color="primary">Save</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
 
-        <md-speed-dial class="md-bottom-right">
-            <md-speed-dial-target @click="create">
-                <md-icon>add</md-icon>
-            </md-speed-dial-target>
-        </md-speed-dial>
+        <v-card>
+            <v-card-title>
+                Games
+                <v-spacer></v-spacer>
+                <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
+            </v-card-title>
+
+            <v-data-table :loading="loading" :headers="headers" :items="games" :search="search">
+                <template v-slot:item.start="{ item }">
+                    {{ formatDateTime(item.start) }}
+                </template>
+            </v-data-table>
+        </v-card>
+
+        <v-btn color="pink" dark fixed bottom right fab @click.stop="showCreate = true">
+            <v-icon>mdi-plus</v-icon>
+        </v-btn>
     </div>
 </template>
 
 <script>
 import moment from 'moment-timezone';
-import LoadingSpinner from './components/LoadingSpinner.vue';
-import CreateGame from './components/CreateGame.vue';
 
-const toLower = (text) => text.toString().toLowerCase()
-
-const searchByTeams = (items, term) => {
-  if (term) {
-    return items.filter((item) => toLower(item.team1.name).includes(toLower(term)) || toLower(item.team2.name).includes(toLower(term)))
-  }
-
-  return items
-}
+const filterTeams = (teams, selected) => teams.filter((e) => selected === null || e.uuid !== selected)
 
 export default {
   name: 'Games',
-  components: { LoadingSpinner, CreateGame },
   data: () => ({
     loading: true,
-    filtered: [],
+    team1: null,
+    team2: null,
+    startDate: null,
+    startTime: null,
+    selectDate: true,
+    selectTime: false,
     search: '',
     error: null,
     showCreate: false,
+    headers: [
+      {
+        text: 'team',
+        value: 'team1.name',
+      },
+      {
+        text: 'at',
+        value: 'team2.name',
+      },
+      {
+        text: 'start',
+        value: 'start',
+      },
+    ],
   }),
   computed: {
-    games() {
-      return this.$store.state.games
-    },
+    start() { return this.formatDateTime(`${this.startDate} ${this.startTime}`) },
+    games() { return this.$store.state.games },
+    teams() { return this.$store.state.teams },
+    teams1() { return filterTeams(this.teams, this.team2); },
+    teams2() { return filterTeams(this.teams, this.team1); },
   },
   created() {
     this.fetchData();
@@ -73,25 +93,30 @@ export default {
     $route: 'fetchData',
   },
   methods: {
-    searchOnTable() {
-      this.filtered = searchByTeams(this.$store.state.games, this.search)
-    },
     fetchData() {
       this.loading = true;
       this.$store.dispatch('GET_GAMES')
-        .then(() => {
-          this.searchOnTable()
-        })
+        .then(() => this.$store.dispatch('GET_TEAMS'))
         .finally(() => {
           this.loading = false
         })
     },
-    create() {
-      this.showCreate = true
+    close() {
+      this.showCreate = false;
+      this.team1 = null;
+      this.team2 = null;
+      this.startDate = null;
+      this.startTime = null;
     },
-    afterCreated() {
-      this.showCreate = false
-      this.fetchData()
+    save() {
+      this.$store.dispatch('SAVE_GAME', {
+        team1: this.team1,
+        team2: this.team2,
+        start: moment(this.start).format()
+      }).then(() => {
+        this.fetchData()
+        this.close()
+      })
     },
     formatDateTime(e) { return moment(e).tz('Europe/Berlin').format('lll') }
   },
