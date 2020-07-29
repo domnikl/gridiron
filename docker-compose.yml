@@ -14,6 +14,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4001:80"
+    depends_on:
+      - db
   db:
     image: library/mysql:8.0
     command: --default-authentication-plugin=mysql_native_password
