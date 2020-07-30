@@ -5,16 +5,16 @@
                 <v-card-title class="headline">Create new game</v-card-title>
 
                 <v-card-text>
-                    <v-select v-model="team1" :items="teams1" item-text="name" item-value="uuid" label="Team 1"></v-select>
+                    <v-select v-model="team1" :items="teams1" item-text="name" item-value="uuid" label="Team 1" autofocus></v-select>
                     <v-select v-model="team2" :items="teams2" item-text="name" item-value="uuid" label="Team 2 (at)"></v-select>
 
                     <v-card flat class="justify-center">
-                        <v-date-picker @change="selectDate = false; selectTime = true" v-if="selectDate" v-model="startDate" full-width scrollable></v-date-picker>
-                        <v-time-picker @change="selectTime = false" format="24hr" v-if="selectTime" v-model="startTime" full-width scrollable></v-time-picker>
+                        <v-date-picker v-if="!selectDate" v-model="selectDate" full-width scrollable></v-date-picker>
+                        <v-time-picker format="24hr" v-if="selectDate && !selectTime" v-model="selectTime" full-width scrollable></v-time-picker>
                     </v-card>
 
-                    <div v-if="!selectDate && !selectTime">
-                        <v-text-field @click="selectDate = true;" prepend-icon="mdi-clock" label="Date" :value="start"></v-text-field>
+                    <div v-if="selectDate && selectTime">
+                        <v-text-field @click:prepend="selectDate = null; selectTime = null" prepend-icon="mdi-clock" label="Date" v-model="start"></v-text-field>
                     </div>
                 </v-card-text>
 
@@ -57,10 +57,9 @@ export default {
     loading: true,
     team1: null,
     team2: null,
-    startDate: null,
-    startTime: null,
-    selectDate: true,
-    selectTime: false,
+    start: null,
+    selectDate: '',
+    selectTime: '',
     search: '',
     error: null,
     showCreate: false,
@@ -80,13 +79,6 @@ export default {
     ],
   }),
   computed: {
-    start() {
-      if (!this.startDate || !this.startTime) {
-        return ''
-      }
-
-      return this.formatDateTime(`${this.startDate} ${this.startTime}`)
-    },
     games() { return this.$store.state.games },
     teams() { return this.$store.state.teams },
     teams1() { return filterTeams(this.teams, this.team2); },
@@ -97,6 +89,12 @@ export default {
   },
   watch: {
     $route: 'fetchData',
+    selectDate() {
+      this.start = this.formatDateTime(`${this.selectDate} ${this.selectTime}`);
+    },
+    selectTime() {
+      this.start = this.formatDateTime(`${this.selectDate} ${this.selectTime}`);
+    }
   },
   methods: {
     fetchData() {
@@ -111,20 +109,18 @@ export default {
       this.showCreate = false;
       this.team1 = null;
       this.team2 = null;
-      this.startDate = null;
-      this.startTime = null;
     },
     save() {
       this.$store.dispatch('SAVE_GAME', {
         team1: this.team1,
         team2: this.team2,
-        start: moment(this.start).format()
+        start: this.start,
       }).then(() => {
         this.fetchData()
         this.close()
       })
     },
-    formatDateTime(e) { return moment(e).tz('Europe/Berlin').format('lll') }
+    formatDateTime(e) { return moment(e).tz('Europe/Berlin').format() }
   },
 };
 </script>

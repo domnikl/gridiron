@@ -20,7 +20,7 @@
                 <v-card-title class="headline">Create new team</v-card-title>
 
                 <v-card-text>
-                    <v-text-field label="Name" v-model="name"></v-text-field>
+                    <v-text-field label="Name" v-model="name" autofocus v-on:keydown.enter="save()"></v-text-field>
                 </v-card-text>
 
                 <v-card-actions>

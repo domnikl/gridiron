@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
+import './app.css'
 
 import App from '@/App.vue';
 import Dashboard from '@/Dasboard.vue';

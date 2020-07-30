@@ -8,7 +8,7 @@
                 <v-toolbar-title>Gridiron</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-toolbar-title>
-                    <v-icon x-small>mdi-account</v-icon>{{ loggedInUser.username }}
+                    <v-icon color="grey">mdi-account</v-icon>{{ loggedInUser.username }}
 
                     <v-btn text x-small @click="logout">
                         <v-icon small color="red">mdi-logout</v-icon>
