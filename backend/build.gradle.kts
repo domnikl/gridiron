@@ -29,6 +29,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-java-time:0.26.1")
     implementation("com.zaxxer:HikariCP:3.4.5")
     implementation("org.slf4j:slf4j-simple:1.7.30")
+    implementation("org.mindrot:jbcrypt:0.4")
 }
 
 tasks {

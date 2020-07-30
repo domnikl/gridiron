@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.joda.JodaModule
 import io.ktor.application.Application
-import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.auth.Authentication
 import io.ktor.auth.jwt.jwt
@@ -12,14 +11,14 @@ import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.http.content.CachingOptions
 import io.ktor.jackson.jackson
-import io.ktor.response.respond
 import io.ktor.routing.routing
 import io.ktor.sessions.Sessions
 import io.ktor.sessions.cookie
 import io.ktor.util.KtorExperimentalAPI
 import org.gridiron.backend.persistence.Games
 import org.gridiron.backend.persistence.Teams
-import org.gridiron.backend.routes.auth
+import org.gridiron.backend.persistence.Users
+import org.gridiron.backend.routes.users
 import org.gridiron.backend.routes.games
 import org.gridiron.backend.routes.teams
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -32,7 +31,7 @@ fun Application.module() {
     val cookieName = "SESSION"
 
     transaction(factory.db) {
-        SchemaUtils.createMissingTablesAndColumns(Teams, Games)
+        SchemaUtils.createMissingTablesAndColumns(Teams, Games, Users)
     }
 
     install(DefaultHeaders)
@@ -85,7 +84,7 @@ fun Application.module() {
     }
 
     routing {
-        auth(jwtAuthentication, cookieName)
+        users(factory.userRepository, jwtAuthentication, cookieName)
         teams(factory.teamRepository)
         games(factory.gameRepository, factory.teamRepository)
     }

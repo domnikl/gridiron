@@ -6,6 +6,7 @@ import io.ktor.config.ApplicationConfig
 import io.ktor.util.KtorExperimentalAPI
 import org.gridiron.backend.model.GameRepository
 import org.gridiron.backend.model.TeamRepository
+import org.gridiron.backend.model.UserRepository
 import org.jetbrains.exposed.sql.Database
 import java.util.concurrent.TimeUnit
 
@@ -47,4 +48,5 @@ class Factory(private val config: ApplicationConfig) {
 
     val teamRepository by lazy { TeamRepository(db) }
     val gameRepository by lazy { GameRepository(db, teamRepository) }
+    val userRepository by lazy { UserRepository(db) }
 }
