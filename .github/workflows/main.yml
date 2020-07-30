@@ -8,4 +8,6 @@ jobs:
       - name: Build the stack
         run: docker-compose build
       - name: Push images
-        run: docker-compose push
+        run: echo $DEPLOY_TOKEN | docker login docker.pkg.github.com -u domnikl --password-stdin && docker-compose push && docker logout
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
