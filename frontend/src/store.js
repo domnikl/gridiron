@@ -9,11 +9,7 @@ const store = new Vuex.Store({
     lastError: '',
     teams: [],
     games: [],
-    user: {
-      uuid: '078a0d22-c344-47b9-af4f-445f3e10ec52',
-      name: 'domnikl',
-      isAdmin: true,
-    }
+    user: null,
   },
   mutations: {
     SET_ERROR: (state, errorMessage) => {
@@ -24,6 +20,9 @@ const store = new Vuex.Store({
     },
     SET_GAMES: (state, payload) => {
       state.games = payload
+    },
+    SET_USER: (state, payload) => {
+      state.user = payload
     }
   },
   actions: {
@@ -54,6 +53,31 @@ const store = new Vuex.Store({
     },
     SAVE_TEAM(context, payload) {
       return Api.post('/teams', payload).then((response, error) => {
+        if (error) {
+          context.commit('SET_ERROR', error.toString())
+        }
+      });
+    },
+    LOGIN(context, payload) {
+      return Api.post('/users/login', payload).then((response, error) => {
+        if (error) {
+          context.commit('SET_ERROR', error.toString())
+        }
+
+        context.commit('SET_USER', response.data);
+      });
+    },
+    LOGOUT(context, payload) {
+      return Api.post('/users/logout', payload).then((response, error) => {
+        if (error) {
+          context.commit('SET_ERROR', error.toString())
+        }
+
+        context.commit('SET_USER', null);
+      });
+    },
+    SIGN_UP(context, payload) {
+      return Api.post('/users', payload).then((response, error) => {
         if (error) {
           context.commit('SET_ERROR', error.toString())
         }

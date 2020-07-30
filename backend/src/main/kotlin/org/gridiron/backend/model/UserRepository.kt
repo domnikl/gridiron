@@ -22,12 +22,12 @@ class UserRepository(private val db: Database) {
     }
 
     private fun exists(uuid: UUID): Boolean {
-        return transaction { byUuid(uuid).count() > 0 }
+        return transaction { byUuid(uuid) } != null
     }
 
     private fun exists(user: User): Boolean {
         return transaction {
-            Users.select { Users.username.eq(user.username) or Users.email.eq(user.email) }.count() > 0
+            Users.select { username.eq(user.username) or email.eq(user.email) }.count() > 0
         }
     }
 
@@ -46,15 +46,20 @@ class UserRepository(private val db: Database) {
         }
     }
 
-    fun find(id: UUID): User {
-        return transaction {
-            byUuid(id).singleOrNull()
-        }?.let {
-            User(it[uuid], it[username], it[password], it[email], it[isAdmin])
-        } ?: throw UserNotFoundException(id)
+    fun authenticate(username: String, password: String): User? {
+        val user = transaction { byUsername(username) }?.map() ?: return null
+
+        return if (user.authenticate(password)) user else null
     }
 
-    private fun byUuid(uuid: UUID) = Users.select { Users.uuid.eq(uuid) and Users.active.eq(true) }
+    fun find(id: UUID): User {
+        return transaction { byUuid(id) }?.map() ?: throw UserNotFoundException(id)
+    }
+
+    private fun ResultRow.map() = User(this[uuid], this[username], this[password], this[email], this[isAdmin])
+
+    private fun byUuid(uuid: UUID) = Users.select { Users.uuid.eq(uuid) and Users.active.eq(true) }.singleOrNull()
+    private fun byUsername(username: String) = Users.select { Users.username.eq(username) and Users.active.eq(true) }.singleOrNull()
 }
 
 class UserNotFoundException(uuid: UUID) :

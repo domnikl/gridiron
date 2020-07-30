@@ -1,9 +1,19 @@
 <template>
     <div class="page-container">
-        <v-app>
+        <NotLoggedIn v-if="!isLoggedIn"></NotLoggedIn>
+
+        <v-app v-if="isLoggedIn">
             <v-app-bar app clipped-right color="#1976d2" dark>
                 <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
                 <v-toolbar-title>Gridiron</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-toolbar-title>
+                    <v-icon x-small>mdi-account</v-icon>{{ loggedInUser.username }}
+
+                    <v-btn text x-small @click="logout">
+                        <v-icon small color="red">mdi-logout</v-icon>
+                    </v-btn>
+                </v-toolbar-title>
             </v-app-bar>
 
             <v-navigation-drawer v-model="drawer" app>
@@ -41,13 +51,24 @@
 </template>
 
 <script>
+import NotLoggedIn from './NotLoggedIn.vue';
 
 export default {
   name: 'App',
+  components: { NotLoggedIn },
   data: () => ({
     drawer: false,
   }),
-};
+  computed: {
+    loggedInUser() { return this.$store.state.user },
+    isLoggedIn() { return this.loggedInUser != null; }
+  },
+  methods: {
+    logout() {
+      this.$store.dispatch('LOGOUT')
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

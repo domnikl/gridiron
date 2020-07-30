@@ -4,6 +4,8 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.auth.jwt.JWTAuthenticationProvider
 import io.ktor.auth.jwt.JWTPrincipal
+import org.gridiron.backend.model.User
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 class JwtAuthentication(
@@ -26,10 +28,14 @@ class JwtAuthentication(
         }
     }
 
-    fun create(): String {
+    fun create(user: User): String {
+        val expiresAt = Date().toInstant().plus(24, ChronoUnit.HOURS)
+
         return JWT.create()
+            .withExpiresAt(Date.from(expiresAt))
             .withAudience(audience)
             .withIssuer(issuer)
+            .withSubject(user.uuid.toString())
             .sign(Algorithm.HMAC256(secret))
     }
 }

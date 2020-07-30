@@ -14,17 +14,29 @@ import org.gridiron.backend.model.UserRepository
 
 fun Route.users(userRepository: UserRepository, jwtAuthentication: JwtAuthentication, cookieName: String) {
     post("/users/login") {
-        // TODO: what if this fails?
         val credentials = call.receive<Credentials>()
 
-        if (credentials.username == "liebler.dominik@gmail.com" && credentials.password == "foobar") {
-            val jwt = jwtAuthentication.create()
+        userRepository.authenticate(credentials.username, credentials.password)?.let { user ->
+            call.sessions.set(cookieName, jwtAuthentication.create(user))
 
-            call.sessions.set(cookieName, jwt)
-            call.respond(HttpStatusCode.NoContent)
+            call.respond(HttpStatusCode.OK, mapOf(
+                "uuid" to user.uuid,
+                "username" to user.username,
+                "email" to user.email,
+                "isAdmin" to user.isAdmin
+            ))
+
+            return@post
         }
 
+        call.sessions.clear(cookieName)
+
         call.respond(HttpStatusCode.Unauthorized)
+    }
+
+    post("/users/logout") {
+        call.sessions.clear(cookieName)
+        call.respond(HttpStatusCode.OK)
     }
 
     post("/users") {
