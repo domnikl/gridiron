@@ -3,9 +3,9 @@ package org.gridiron.backend.model
 import org.joda.time.DateTime
 import java.util.UUID
 
-data class Game(val uuid: UUID, val team1: Team, val team2: Team, val start: DateTime, val bets: MutableMap<Pair<UUID, User>, Bet>) {
+data class Game(val uuid: UUID, val team1: Team, val team2: Team, val start: DateTime, val bets: MutableList<Bet>) {
     fun placeBet(user: User, away: Int, home: Int) {
-        bets[uuid to user] = Bet(user, away, home)
+        bets.add(Bet(user.uuid, away, home))
     }
 
     companion object {
@@ -15,10 +15,10 @@ data class Game(val uuid: UUID, val team1: Team, val team2: Team, val start: Dat
                 team1,
                 team2,
                 start,
-                mutableMapOf()
+                mutableListOf()
             )
         }
     }
 }
 
-data class Bet(val user: User, val away: Int, val home: Int)
+data class Bet(val user: UUID, val away: Int, val home: Int)

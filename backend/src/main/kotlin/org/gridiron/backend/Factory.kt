@@ -47,6 +47,6 @@ class Factory(private val config: ApplicationConfig) {
     }
 
     val teamRepository by lazy { TeamRepository(db) }
-    val gameRepository by lazy { GameRepository(db, teamRepository, userRepository) }
+    val gameRepository by lazy { GameRepository(db, teamRepository) }
     val userRepository by lazy { UserRepository(db) }
 }

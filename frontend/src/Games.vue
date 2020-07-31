@@ -1,5 +1,11 @@
 <template>
     <div>
+        <PlaceBetDialog
+            :game="placeBetOn"
+            :bet="getMyBet(placeBetOn)"
+            @close="placeBetOn = null"
+            @placeBet="placeBet"></PlaceBetDialog>
+
         <v-dialog v-model="showCreate">
             <v-card>
                 <v-card-title class="headline">Create new game</v-card-title>
@@ -35,7 +41,11 @@
 
             <v-data-table :loading="loading" :headers="headers" :items="games" :search="search">
                 <template v-slot:item.start="{ item }">
-                    {{ formatDateTime(item.start) }}
+                    {{ formatDateTimeTable(item.start) }}
+                </template>
+                <template v-slot:item.actions="{ item }">
+                    <v-icon small class="mr-2" :color="betEditColor(item)" @click="startBetting(item)">mdi-scoreboard-outline</v-icon>
+                    <span v-if="getMyBet(item)">{{ getMyBet(item).away }}:{{ getMyBet(item).home }}</span>
                 </template>
             </v-data-table>
         </v-card>
@@ -48,11 +58,13 @@
 
 <script>
 import moment from 'moment-timezone';
+import PlaceBetDialog from './PlaceBetDialog.vue';
 
 const filterTeams = (teams, selected) => teams.filter((e) => selected === null || e.uuid !== selected)
 
 export default {
   name: 'Games',
+  components: { PlaceBetDialog },
   data: () => ({
     loading: true,
     team1: null,
@@ -63,6 +75,7 @@ export default {
     search: '',
     error: null,
     showCreate: false,
+    placeBetOn: null,
     headers: [
       {
         text: 'team',
@@ -75,6 +88,10 @@ export default {
       {
         text: 'start',
         value: 'start',
+      },
+      {
+        text: 'actions',
+        value: 'actions',
       },
     ],
   }),
@@ -120,7 +137,40 @@ export default {
         this.close()
       })
     },
-    formatDateTime(e) { return moment(e).tz('Europe/Berlin').format() }
+    startBetting(item) {
+      this.placeBetOn = item;
+    },
+    placeBet(bet) {
+      this.$store.dispatch('PLACE_BET', bet)
+        .then(() => {
+          this.fetchData()
+          this.placeBetOn = null;
+        })
+    },
+    getMyBet(game) {
+      if (game === null) {
+        return null;
+      }
+
+      const filtered = game.bets.filter((e) => e.user === this.$store.state.user.uuid);
+
+      if (filtered.length === 1) {
+        return filtered[0]
+      }
+
+      return null;
+    },
+    betEditColor(game) {
+      let color = 'error';
+
+      if (this.getMyBet(game) !== null) {
+        color = 'success'
+      }
+
+      return color;
+    },
+    formatDateTime(e) { return moment(e).tz('Europe/Berlin').format() },
+    formatDateTimeTable(e) { return moment(e).format('lll') }
   },
 };
 </script>

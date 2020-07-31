@@ -12,8 +12,7 @@ import java.util.*
 
 class GameRepository(
     private val db: Database,
-    private val teamRepository: TeamRepository,
-    private val userRepository: UserRepository
+    private val teamRepository: TeamRepository
 ) {
     fun generateId(): UUID {
         lateinit var uuid: UUID
@@ -38,26 +37,26 @@ class GameRepository(
                 teamRepository.find(it[team1]),
                 teamRepository.find(it[team2]),
                 it[start],
-                betsByGame(it[uuid]).toMutableMap()
+                betsByGame(it[uuid]).toMutableList()
             )
         }
     }
 
     fun save(game: Game) {
         return transaction(db) {
-            Games.insertIgnore {
+            Games.replace {
                 it[uuid] = game.uuid
                 it[team1] = game.team1.uuid
                 it[team2] = game.team2.uuid
                 it[start] = game.start
             }
 
-            game.bets.forEach { (_, u) ->
+            game.bets.forEach { bet ->
                 Bets.replace {
-                    it[user] = u.user.uuid
+                    it[user] = bet.user
                     it[Bets.game] = game.uuid
-                    it[away] = u.away
-                    it[home] = u.home
+                    it[away] = bet.away
+                    it[home] = bet.home
                 }
             }
         }
@@ -65,30 +64,26 @@ class GameRepository(
 
     fun find(id: UUID): Game {
         return transaction {
-            byUuid(id).singleOrNull()
-        }?.let {
-            Game(
-                it[uuid],
-                teamRepository.find(it[team1]),
-                teamRepository.find(it[team2]),
-                it[start],
-                betsByGame(id).toMutableMap()
-            )
+            byUuid(id).singleOrNull()?.let {
+                Game(
+                    it[uuid],
+                    teamRepository.find(it[team1]),
+                    teamRepository.find(it[team2]),
+                    it[start],
+                    betsByGame(id).toMutableList()
+                )
+            }
         } ?: throw GameNotFoundException(id)
     }
 
     private fun byUuid(uuid: UUID) = Games.select { Games.uuid.eq(uuid ) }
-    private fun betsByGame(uuid: UUID) = transaction {
-        Bets.select { Bets.game.eq(uuid) }
-    }.map {
-        val user = userRepository.find(it[Bets.user])
-
-        (uuid to user) to Bet(
-            user,
+    private fun betsByGame(uuid: UUID) = Bets.select { Bets.game.eq(uuid) }.map {
+        Bet(
+            it[Bets.user],
             it[Bets.away],
             it[Bets.home]
         )
-    }.toMap()
+    }
 }
 
 class GameNotFoundException(uuid: UUID) :
