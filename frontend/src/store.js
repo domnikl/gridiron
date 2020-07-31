@@ -23,6 +23,10 @@ const request = (context, config) => {
       context.commit('SET_USER', null)
     }
 
+    if (reason.response.data && reason.response.data.message) {
+      reason = reason.response.data.message
+    }
+
     context.commit('SET_ERROR', reason)
   })
 }

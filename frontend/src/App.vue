@@ -46,6 +46,10 @@
                     </v-row>
                 </v-container>
             </v-main>
+
+            <v-snackbar v-model="snackbar">
+                <v-row justify="center">{{ snackbarMessage }}</v-row>
+            </v-snackbar>
         </v-app>
     </div>
 </template>
@@ -58,10 +62,17 @@ export default {
   components: { NotLoggedIn },
   data: () => ({
     drawer: false,
+    snackbar: false,
   }),
+  watch: {
+    snackbarMessage() {
+      this.snackbar = true;
+    }
+  },
   computed: {
     loggedInUser() { return this.$store.state.user },
-    isLoggedIn() { return this.loggedInUser != null; }
+    isLoggedIn() { return this.loggedInUser != null; },
+    snackbarMessage() { return this.$store.state.lastError; }
   },
   methods: {
     logout() {
