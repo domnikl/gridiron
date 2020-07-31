@@ -1,8 +1,31 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import Api from './api'
+import axios from 'axios';
 
 Vue.use(Vuex)
+
+const client = axios.create({
+  baseURL: process.env.VUE_APP_API_BASE_URL,
+});
+
+client.interceptors.response.use(
+  (response) => response,
+  (error) => Promise.reject(error),
+);
+
+const request = (context, config) => {
+  if (context.state.user) {
+    config.headers = { Authorization: `Bearer ${context.state.user.jwt}` }
+  }
+
+  return client.request(config).catch((reason) => {
+    if (reason.response.status === 401) {
+      context.commit('SET_USER', null)
+    }
+
+    context.commit('SET_ERROR', reason)
+  })
+}
 
 const store = new Vuex.Store({
   state: {
@@ -12,8 +35,8 @@ const store = new Vuex.Store({
     user: JSON.parse(localStorage.getItem('user')),
   },
   mutations: {
-    SET_ERROR: (state, errorMessage) => {
-      state.lastError = errorMessage
+    SET_ERROR: (state, error) => {
+      state.lastError = error
     },
     SET_TEAMS: (state, payload) => {
       state.teams = payload
@@ -29,64 +52,28 @@ const store = new Vuex.Store({
   },
   actions: {
     GET_TEAMS(context) {
-      return Api.get('/teams', { headers: { Authorization: `Bearer ${context.state.user.jwt}` } }).then((response, error) => {
-        if (error) {
-          context.commit('SET_ERROR', error.toString())
-        } else {
-          context.commit('SET_TEAMS', response.data)
-        }
-      });
+      return request(context, { url: '/teams' })
+        .then((response) => { context.commit('SET_TEAMS', response.data) })
     },
     GET_GAMES(context) {
-      return Api.get('/games').then((response, error) => {
-        if (error) {
-          context.commit('SET_ERROR', error.toString())
-        } else {
-          context.commit('SET_GAMES', response.data)
-        }
-      });
+      return request(context, { url: '/games' })
+        .then((response) => { context.commit('SET_GAMES', response.data) })
     },
     SAVE_GAME(context, payload) {
-      return Api.post('/games', payload).then((response, error) => {
-        if (error) {
-          context.commit('SET_ERROR', error.toString())
-        }
-      });
+      return request(context, { method: 'POST', url: '/games', data: payload })
     },
     SAVE_TEAM(context, payload) {
-      return Api.post('/teams', payload).then((response, error) => {
-        if (error) {
-          context.commit('SET_ERROR', error.toString())
-        }
-      });
+      return request(context, { method: 'POST', url: '/teams', data: payload })
     },
     LOGIN(context, payload) {
-      return Api.post('/auth', payload).then((response, error) => {
-        if (error) {
-          context.commit('SET_ERROR', error.toString())
-        }
-
-        context.commit('SET_USER', response.data);
-      });
-    },
-    CHECK_AUTH(context) {
-      return Api.get('/auth').then((response, error) => {
-        if (error) {
-          context.commit('SET_ERROR', error.toString())
-        }
-
-        context.commit('SET_USER', response.data);
-      });
+      return request(context, { method: 'POST', url: '/auth', data: payload })
+        .then((response) => { context.commit('SET_USER', response.data) })
     },
     LOGOUT(context) {
       context.commit('SET_USER', null);
     },
     SIGN_UP(context, payload) {
-      return Api.post('/users', payload).then((response, error) => {
-        if (error) {
-          context.commit('SET_ERROR', error.toString())
-        }
-      });
+      return request(context, { method: 'POST', url: '/users', data: payload })
     }
   }
 })

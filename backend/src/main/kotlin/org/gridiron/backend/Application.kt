@@ -9,6 +9,7 @@ import io.ktor.application.log
 import io.ktor.auth.Authentication
 import io.ktor.auth.UserIdPrincipal
 import io.ktor.auth.authenticate
+import io.ktor.auth.jwt.JWTPrincipal
 import io.ktor.auth.jwt.jwt
 import io.ktor.features.*
 import io.ktor.http.*
@@ -80,9 +81,7 @@ fun Application.module() {
         jwt {
             realm = jwtAuthentication.realm
             verifier(jwtAuthentication.verifier)
-            validate {
-                UserIdPrincipal(it.payload.getClaim("name").asString())
-            }
+            validate { JWTPrincipal(it.payload) }
         }
     }
 

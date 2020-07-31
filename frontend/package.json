@@ -51,7 +51,8 @@
       "no-param-reassign": "off",
       "max-len": "off",
       "semi": "off",
-      "comma-dangle": "off"
+      "comma-dangle": "off",
+      "no-debugger": "off"
     },
     "parserOptions": {
       "parser": "babel-eslint"
