@@ -1,6 +1,7 @@
 package org.gridiron.backend
 
 import com.auth0.jwt.JWT
+import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTDecodeException
 import com.auth0.jwt.interfaces.DecodedJWT
@@ -11,24 +12,13 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 
 class JwtAuthentication(
-    private val realm: String,
+    val realm: String,
     private val issuer: String,
     private val audience: String,
-    private val secret: String
+    secret: String
 ) {
-    fun provider(configuration: JWTAuthenticationProvider.Configuration) {
-        val verifier = JWT
-                .require(Algorithm.HMAC256(secret))
-                .withAudience(audience)
-                .withIssuer(issuer)
-                .build()
-
-        configuration.realm = realm
-        configuration.verifier(verifier)
-        configuration.validate { credential ->
-            if (credential.payload.audience.contains(audience)) JWTPrincipal(credential.payload) else null
-        }
-    }
+    private val algorithm = Algorithm.HMAC256(secret)
+    val verifier: JWTVerifier =  JWT.require(algorithm).build()
 
     fun create(user: User): String {
         val expiresAt = Date().toInstant().plus(24, ChronoUnit.HOURS)
@@ -38,11 +28,11 @@ class JwtAuthentication(
             .withAudience(audience)
             .withIssuer(issuer)
             .withSubject(user.uuid.toString())
-            .sign(Algorithm.HMAC256(secret))
+            .sign(algorithm)
     }
 
     fun check(token: String): DecodedJWT? = try {
-        JWT.decode(token)
+        verifier.verify(JWT.decode(token))
     } catch (e: JWTDecodeException) {
         null;
     }

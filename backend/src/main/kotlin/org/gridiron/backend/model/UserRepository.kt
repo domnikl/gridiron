@@ -62,7 +62,7 @@ class UserRepository(private val db: Database) {
     private fun byUsername(username: String) = Users.select { Users.username.eq(username) and Users.active.eq(true) }.singleOrNull()
 }
 
-class UserNotFoundException(uuid: UUID) :
+class UserNotFoundException(uuid: UUID?) :
     RuntimeException("User could not be found '$uuid'")
 
 class UserAlreadyExistsException(user: User) :

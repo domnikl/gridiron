@@ -5,7 +5,10 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.joda.JodaModule
 import io.ktor.application.Application
 import io.ktor.application.install
+import io.ktor.application.log
 import io.ktor.auth.Authentication
+import io.ktor.auth.UserIdPrincipal
+import io.ktor.auth.authenticate
 import io.ktor.auth.jwt.jwt
 import io.ktor.features.*
 import io.ktor.http.*
@@ -15,6 +18,7 @@ import io.ktor.routing.routing
 import io.ktor.sessions.Sessions
 import io.ktor.sessions.cookie
 import io.ktor.util.KtorExperimentalAPI
+import org.gridiron.backend.persistence.Bets
 import org.gridiron.backend.persistence.Games
 import org.gridiron.backend.persistence.Teams
 import org.gridiron.backend.persistence.Users
@@ -28,10 +32,9 @@ import org.jetbrains.exposed.sql.transactions.transaction
 fun Application.module() {
     val factory = Factory(environment.config)
     val jwtAuthentication = factory.jwtAuthentication
-    val cookieName = "SESSION"
 
     transaction(factory.db) {
-        SchemaUtils.createMissingTablesAndColumns(Teams, Games, Users)
+        SchemaUtils.createMissingTablesAndColumns(Teams, Games, Users, Bets)
     }
 
     install(DefaultHeaders)
@@ -75,17 +78,20 @@ fun Application.module() {
     }
     install(Authentication) {
         jwt {
-            jwtAuthentication.provider(this)
+            realm = jwtAuthentication.realm
+            verifier(jwtAuthentication.verifier)
+            validate {
+                UserIdPrincipal(it.payload.getClaim("name").asString())
+            }
         }
     }
 
-    install(Sessions) {
-        cookie<String>(cookieName)
-    }
-
     routing {
-        users(factory.userRepository, jwtAuthentication, cookieName)
-        teams(factory.teamRepository)
-        games(factory.gameRepository, factory.teamRepository)
+        users(factory.userRepository, jwtAuthentication)
+
+        authenticate {
+            teams(factory.teamRepository)
+            games(factory.gameRepository, factory.teamRepository, factory.userRepository)
+        }
     }
 }

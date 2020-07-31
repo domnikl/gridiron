@@ -9,7 +9,7 @@ const store = new Vuex.Store({
     lastError: '',
     teams: [],
     games: [],
-    user: null,
+    user: JSON.parse(localStorage.getItem('user')),
   },
   mutations: {
     SET_ERROR: (state, errorMessage) => {
@@ -22,12 +22,14 @@ const store = new Vuex.Store({
       state.games = payload
     },
     SET_USER: (state, payload) => {
+      localStorage.setItem('user', JSON.stringify(payload))
+
       state.user = payload
     }
   },
   actions: {
     GET_TEAMS(context) {
-      return Api.get('/teams').then((response, error) => {
+      return Api.get('/teams', { headers: { Authorization: `Bearer ${context.state.user.jwt}` } }).then((response, error) => {
         if (error) {
           context.commit('SET_ERROR', error.toString())
         } else {
@@ -76,14 +78,8 @@ const store = new Vuex.Store({
         context.commit('SET_USER', response.data);
       });
     },
-    LOGOUT(context, payload) {
-      return Api.delete('/auth/logout', payload).then((response, error) => {
-        if (error) {
-          context.commit('SET_ERROR', error.toString())
-        }
-
-        context.commit('SET_USER', null);
-      });
+    LOGOUT(context) {
+      context.commit('SET_USER', null);
     },
     SIGN_UP(context, payload) {
       return Api.post('/users', payload).then((response, error) => {

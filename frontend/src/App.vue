@@ -63,9 +63,6 @@ export default {
     loggedInUser() { return this.$store.state.user },
     isLoggedIn() { return this.loggedInUser != null; }
   },
-  created() {
-    this.$store.dispatch('CHECK_AUTH')
-  },
   methods: {
     logout() {
       this.$store.dispatch('LOGOUT')
