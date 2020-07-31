@@ -2,6 +2,8 @@ package org.gridiron.backend
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.exceptions.JWTDecodeException
+import com.auth0.jwt.interfaces.DecodedJWT
 import io.ktor.auth.jwt.JWTAuthenticationProvider
 import io.ktor.auth.jwt.JWTPrincipal
 import org.gridiron.backend.model.User
@@ -37,5 +39,11 @@ class JwtAuthentication(
             .withIssuer(issuer)
             .withSubject(user.uuid.toString())
             .sign(Algorithm.HMAC256(secret))
+    }
+
+    fun check(token: String): DecodedJWT? = try {
+        JWT.decode(token)
+    } catch (e: JWTDecodeException) {
+        null;
     }
 }

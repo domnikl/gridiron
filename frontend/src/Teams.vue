@@ -2,7 +2,7 @@
     <div>
         <h1><v-icon>mdi-account-group</v-icon> Teams</h1>
 
-        <v-data-iterator :items="teams" :loading="loading">
+        <v-data-iterator :items="teams" :loading="loading" :items-per-page="itemsPerPage">
             <template v-slot:default="props">
                 <v-row>
                     <v-col v-for="item in props.items" :key="item.uuid" cols="12" sm="6" md="4" lg="3">
@@ -41,6 +41,7 @@
 export default {
   name: 'Teams',
   data: () => ({
+    itemsPerPage: 15,
     loading: false,
     error: null,
     showCreate: false,

@@ -59,7 +59,16 @@ const store = new Vuex.Store({
       });
     },
     LOGIN(context, payload) {
-      return Api.post('/users/login', payload).then((response, error) => {
+      return Api.post('/auth', payload).then((response, error) => {
+        if (error) {
+          context.commit('SET_ERROR', error.toString())
+        }
+
+        context.commit('SET_USER', response.data);
+      });
+    },
+    CHECK_AUTH(context) {
+      return Api.get('/auth').then((response, error) => {
         if (error) {
           context.commit('SET_ERROR', error.toString())
         }
@@ -68,7 +77,7 @@ const store = new Vuex.Store({
       });
     },
     LOGOUT(context, payload) {
-      return Api.post('/users/logout', payload).then((response, error) => {
+      return Api.delete('/auth/logout', payload).then((response, error) => {
         if (error) {
           context.commit('SET_ERROR', error.toString())
         }

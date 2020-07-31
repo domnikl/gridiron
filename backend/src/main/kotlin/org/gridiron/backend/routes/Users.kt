@@ -5,15 +5,18 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.Route
+import io.ktor.routing.delete
+import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.sessions.sessions
 import org.gridiron.backend.JwtAuthentication
 import org.gridiron.backend.model.TeamAlreadyExistsException
 import org.gridiron.backend.model.User
 import org.gridiron.backend.model.UserRepository
+import java.util.*
 
 fun Route.users(userRepository: UserRepository, jwtAuthentication: JwtAuthentication, cookieName: String) {
-    post("/users/login") {
+    post("/auth") {
         val credentials = call.receive<Credentials>()
 
         userRepository.authenticate(credentials.username, credentials.password)?.let { user ->
@@ -34,9 +37,28 @@ fun Route.users(userRepository: UserRepository, jwtAuthentication: JwtAuthentica
         call.respond(HttpStatusCode.Unauthorized)
     }
 
-    post("/users/logout") {
+    delete("/auth") {
         call.sessions.clear(cookieName)
         call.respond(HttpStatusCode.OK)
+    }
+
+    get("/auth") {
+        (call.sessions.get(cookieName) as String?)?.let { jwt ->
+            jwtAuthentication.check(jwt)?.subject?.let { uuid ->
+                val user = userRepository.find(UUID.fromString(uuid))
+
+                call.respond(HttpStatusCode.OK, mapOf(
+                        "uuid" to user.uuid,
+                        "username" to user.username,
+                        "email" to user.email,
+                        "isAdmin" to user.isAdmin
+                ))
+
+                return@get
+            }
+        }
+
+        call.respond(HttpStatusCode.Unauthorized)
     }
 
     post("/users") {
