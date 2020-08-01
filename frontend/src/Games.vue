@@ -43,7 +43,7 @@
                 <template v-slot:item.start="{ item }">
                     {{ formatDateTimeTable(item.start) }}
                 </template>
-                <template v-slot:item.actions="{ item }">
+                <template v-slot:item.score="{ item }">
                     <v-icon small class="mr-2" :color="betEditColor(item)" @click="startBetting(item)">mdi-scoreboard-outline</v-icon>
                     <span v-if="getMyBet(item)">{{ getMyBet(item).away }}:{{ getMyBet(item).home }}</span>
                 </template>
@@ -90,8 +90,8 @@ export default {
         value: 'start',
       },
       {
-        text: 'actions',
-        value: 'actions',
+        text: 'your bet on score',
+        value: 'score',
       },
     ],
   }),
