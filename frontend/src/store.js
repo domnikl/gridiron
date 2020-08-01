@@ -69,6 +69,9 @@ const store = new Vuex.Store({
     PLACE_BET(context, payload) {
       return request(context, { method: 'POST', url: `/games/${payload.game.uuid}/bets`, data: payload })
     },
+    END_GAME(context, payload) {
+      return request(context, { method: 'PATCH', url: `/games/${payload.game.uuid}`, data: payload })
+    },
     SAVE_TEAM(context, payload) {
       return request(context, { method: 'POST', url: '/teams', data: payload })
     },

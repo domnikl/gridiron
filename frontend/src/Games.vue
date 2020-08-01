@@ -6,6 +6,11 @@
             @close="placeBetOn = null"
             @placeBet="placeBet"></PlaceBetDialog>
 
+        <EndGameDialog
+            :game="gameToEnd"
+            @close="gameToEnd = null"
+            @endGame="endGame"></EndGameDialog>
+
         <v-dialog v-model="showCreate">
             <v-card>
                 <v-card-title class="headline">Create new game</v-card-title>
@@ -44,6 +49,8 @@
                     {{ formatDateTimeTable(item.start) }}
                 </template>
                 <template v-slot:item.score="{ item }">
+                    <v-icon v-if="$store.state.user.isAdmin" small class="mr-2" @click="gameToEnd = item">mdi-check</v-icon>
+
                     <v-icon small class="mr-2" :color="betEditColor(item)" @click="startBetting(item)">mdi-scoreboard-outline</v-icon>
                     <span v-if="getMyBet(item)">{{ getMyBet(item).score.away }}:{{ getMyBet(item).score.home }}</span>
                 </template>
@@ -59,12 +66,13 @@
 <script>
 import moment from 'moment-timezone';
 import PlaceBetDialog from './PlaceBetDialog.vue';
+import EndGameDialog from './EndGameDialog.vue';
 
 const filterTeams = (teams, selected) => teams.filter((e) => selected === null || e.uuid !== selected)
 
 export default {
   name: 'Games',
-  components: { PlaceBetDialog },
+  components: { PlaceBetDialog, EndGameDialog },
   data: () => ({
     loading: true,
     team1: null,
@@ -76,6 +84,7 @@ export default {
     error: null,
     showCreate: false,
     placeBetOn: null,
+    gameToEnd: null,
     headers: [
       {
         text: 'team',
@@ -96,7 +105,7 @@ export default {
     ],
   }),
   computed: {
-    games() { return this.$store.state.games },
+    games() { return this.$store.state.games.filter((game) => game.score === null) },
     teams() { return this.$store.state.teams },
     teams1() { return filterTeams(this.teams, this.team2); },
     teams2() { return filterTeams(this.teams, this.team1); },
@@ -168,6 +177,16 @@ export default {
       }
 
       return color;
+    },
+    endGame(payload) {
+      this.$store.dispatch('END_GAME', {
+        game: payload.game,
+        away: payload.away,
+        home: payload.home
+      }).then(() => {
+        this.gameToEnd = null;
+        this.fetchData()
+      })
     },
     formatDateTime(e) { return moment(e).tz('Europe/Berlin').format() },
     formatDateTimeTable(e) { return moment(e).format('lll') }

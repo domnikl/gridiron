@@ -1,14 +1,22 @@
 <template>
     <v-dialog :value="!!game" v-if="!!game" @click:outside="close()" @keydown.esc="close()">
         <v-card>
-            <v-card-title class="headline">What's your bet on the score?</v-card-title>
+            <v-card-title class="headline">
+                End game
+                <v-spacer></v-spacer>
+                <span class="text-subtitle-1">{{ game.bets.length }} bets</span>
+            </v-card-title>
 
             <v-card-text>
                 <v-text-field :label="game.team1.name" v-model="away" append-outer-icon="mdi-scoreboard-outline" autofocus></v-text-field>
                 at
                 <v-text-field :label="game.team2.name" v-model="home" append-outer-icon="mdi-scoreboard-outline" v-on:keydown.enter="save()"></v-text-field>
 
-                Game starts at {{ start }}
+                <p>
+                    Game started at {{ start }}
+                </p>
+
+                <v-alert type="warning" border="right" elevation="2" dense>Are you sure? This change can not be reverted!</v-alert>
             </v-card-text>
 
             <v-card-actions>
@@ -24,20 +32,12 @@
 import moment from 'moment-timezone';
 
 export default {
-  name: 'PlaceBetDialog',
-  props: ['game', 'bet'],
+  name: 'EndGameDialog',
+  props: ['game'],
   data() {
     return {
       home: null,
       away: null,
-    }
-  },
-  watch: {
-    bet(newValue) {
-      if (newValue === null) return
-
-      this.home = newValue.score.home
-      this.away = newValue.score.away
     }
   },
   computed: {
@@ -50,7 +50,7 @@ export default {
       this.$emit('close')
     },
     save() {
-      this.$emit('placeBet', {
+      this.$emit('endGame', {
         game: { uuid: this.game.uuid },
         home: this.home,
         away: this.away
