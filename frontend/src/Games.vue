@@ -11,31 +11,10 @@
             @close="gameToEnd = null"
             @endGame="endGame"></EndGameDialog>
 
-        <v-dialog v-model="showCreate">
-            <v-card>
-                <v-card-title class="headline">Create new game</v-card-title>
-
-                <v-card-text>
-                    <v-select v-model="team1" :items="teams1" item-text="name" item-value="uuid" label="Team 1" autofocus></v-select>
-                    <v-select v-model="team2" :items="teams2" item-text="name" item-value="uuid" label="Team 2 (at)"></v-select>
-
-                    <v-card flat class="justify-center">
-                        <v-date-picker v-if="!selectDate" v-model="selectDate" full-width scrollable></v-date-picker>
-                        <v-time-picker format="24hr" v-if="selectDate && !selectTime" v-model="selectTime" full-width scrollable></v-time-picker>
-                    </v-card>
-
-                    <div v-if="selectDate && selectTime">
-                        <v-text-field @click:prepend="selectDate = null; selectTime = null" prepend-icon="mdi-clock" label="Date" v-model="start"></v-text-field>
-                    </div>
-                </v-card-text>
-
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn @click="close()" text>Close</v-btn>
-                    <v-btn @click="save()" text color="primary">Save</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
+        <CreateGameDialog
+            :show="showCreate"
+            @close="showCreate = false"
+            @save="saveGame"></CreateGameDialog>
 
         <v-card>
             <v-card-title>
@@ -65,6 +44,7 @@
 
 <script>
 import moment from 'moment-timezone';
+import CreateGameDialog from './CreateGameDialog.vue';
 import PlaceBetDialog from './PlaceBetDialog.vue';
 import EndGameDialog from './EndGameDialog.vue';
 
@@ -72,16 +52,10 @@ const filterTeams = (teams, selected) => teams.filter((e) => selected === null |
 
 export default {
   name: 'Games',
-  components: { PlaceBetDialog, EndGameDialog },
+  components: { CreateGameDialog, PlaceBetDialog, EndGameDialog },
   data: () => ({
     loading: true,
-    team1: null,
-    team2: null,
-    start: null,
-    selectDate: '',
-    selectTime: '',
     search: '',
-    error: null,
     showCreate: false,
     placeBetOn: null,
     gameToEnd: null,
@@ -115,12 +89,6 @@ export default {
   },
   watch: {
     $route: 'fetchData',
-    selectDate() {
-      this.start = this.formatDateTime(`${this.selectDate} ${this.selectTime}`);
-    },
-    selectTime() {
-      this.start = this.formatDateTime(`${this.selectDate} ${this.selectTime}`);
-    }
   },
   methods: {
     fetchData() {
@@ -131,19 +99,14 @@ export default {
           this.loading = false
         })
     },
-    close() {
-      this.showCreate = false;
-      this.team1 = null;
-      this.team2 = null;
-    },
-    save() {
+    saveGame(game) {
       this.$store.dispatch('SAVE_GAME', {
-        team1: this.team1,
-        team2: this.team2,
-        start: this.start,
+        team1: game.team1,
+        team2: game.team2,
+        start: game.start,
       }).then(() => {
         this.fetchData()
-        this.close()
+        this.showCreate = false
       })
     },
     startBetting(item) {
@@ -188,7 +151,7 @@ export default {
         this.fetchData()
       })
     },
-    formatDateTime(e) { return moment(e).tz('Europe/Berlin').format() },
+    formatDateTime(e) { return moment(e).format() },
     formatDateTimeTable(e) { return moment(e).format('lll') }
   },
 };
