@@ -56,6 +56,12 @@ class UserRepository(private val db: Database) {
         return transaction { byUuid(id) }?.map() ?: throw UserNotFoundException(id)
     }
 
+    fun all(): List<User> = transaction {
+        Users.select { active.eq(true) }
+            .orderBy(score to SortOrder.DESC)
+            .map { it.map() }
+    }
+
     private fun ResultRow.map() = User(
         this[uuid],
         this[username],
@@ -65,8 +71,8 @@ class UserRepository(private val db: Database) {
         this[active],
         this[isAdmin]
     )
-
     private fun byUuid(uuid: UUID) = Users.select { Users.uuid.eq(uuid) and Users.active.eq(true) }.singleOrNull()
+
     private fun byUsername(username: String) = Users.select { Users.username.eq(username) and Users.active.eq(true) }.singleOrNull()
 }
 

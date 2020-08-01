@@ -36,6 +36,7 @@ const store = new Vuex.Store({
     lastError: '',
     teams: [],
     games: [],
+    users: [],
     user: JSON.parse(localStorage.getItem('user')),
   },
   mutations: {
@@ -48,6 +49,9 @@ const store = new Vuex.Store({
     SET_GAMES: (state, payload) => {
       state.games = payload
     },
+    SET_USERS: (state, payload) => {
+      state.users = payload
+    },
     SET_USER: (state, payload) => {
       localStorage.setItem('user', JSON.stringify(payload))
 
@@ -55,6 +59,10 @@ const store = new Vuex.Store({
     }
   },
   actions: {
+    GET_USERS(context) {
+      return request(context, { url: '/users' })
+        .then((response) => { context.commit('SET_USERS', response.data) })
+    },
     GET_TEAMS(context) {
       return request(context, { url: '/teams' })
         .then((response) => { context.commit('SET_TEAMS', response.data) })

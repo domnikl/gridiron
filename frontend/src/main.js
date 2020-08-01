@@ -4,10 +4,10 @@ import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
 import './app.css'
 
-import App from '@/App.vue';
-import Dashboard from '@/Dasboard.vue';
-import Teams from '@/Teams.vue';
-import Games from '@/Games.vue';
+import App from './App.vue';
+import Dashboard from './Dashboard.vue';
+import Teams from './Teams.vue';
+import Games from './Games.vue';
 import store from './store';
 
 Vue.use(Vuetify)

@@ -1,23 +1,30 @@
 package org.gridiron.backend.routes
 
 import io.ktor.application.call
+import io.ktor.auth.authenticate
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.Route
-import io.ktor.routing.delete
 import io.ktor.routing.get
 import io.ktor.routing.post
-import io.ktor.sessions.get
-import io.ktor.sessions.sessions
 import org.gridiron.backend.JwtAuthentication
-import org.gridiron.backend.model.TeamAlreadyExistsException
 import org.gridiron.backend.model.User
 import org.gridiron.backend.model.UserAlreadyExistsException
 import org.gridiron.backend.model.UserRepository
-import java.util.*
 
 fun Route.users(userRepository: UserRepository, jwtAuthentication: JwtAuthentication) {
+    authenticate {
+        get("/users") {
+            call.respond(userRepository.all().map {
+                mapOf(
+                    "username" to it.username,
+                    "score" to it.score
+                )
+            })
+        }
+    }
+
     post("/auth") {
         val credentials = call.receive<Credentials>()
 
