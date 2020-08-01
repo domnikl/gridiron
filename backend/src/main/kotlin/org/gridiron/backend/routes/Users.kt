@@ -13,6 +13,7 @@ import io.ktor.sessions.sessions
 import org.gridiron.backend.JwtAuthentication
 import org.gridiron.backend.model.TeamAlreadyExistsException
 import org.gridiron.backend.model.User
+import org.gridiron.backend.model.UserAlreadyExistsException
 import org.gridiron.backend.model.UserRepository
 import java.util.*
 
@@ -47,10 +48,14 @@ fun Route.users(userRepository: UserRepository, jwtAuthentication: JwtAuthentica
                 newUser.email
             )
 
+            if (userRepository.exists(user)) {
+                throw UserAlreadyExistsException(user)
+            }
+
             userRepository.save(user)
 
             call.respond(HttpStatusCode.Created, mapOf("id" to id))
-        } catch (e: TeamAlreadyExistsException) {
+        } catch (e: UserAlreadyExistsException) {
             call.respond(HttpStatusCode.Conflict, mapOf("message" to e.message))
         }
     }

@@ -2,10 +2,13 @@ package org.gridiron.backend.model
 
 import org.gridiron.backend.persistence.Bets
 import org.gridiron.backend.persistence.Games
+import org.gridiron.backend.persistence.Games.scoreAway
+import org.gridiron.backend.persistence.Games.scoreHome
 import org.gridiron.backend.persistence.Games.start
 import org.gridiron.backend.persistence.Games.team1
 import org.gridiron.backend.persistence.Games.team2
 import org.gridiron.backend.persistence.Games.uuid
+import org.gridiron.backend.persistence.Users
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
@@ -31,15 +34,7 @@ class GameRepository(
     }
 
     fun all() = transaction(db) {
-        Games.selectAll().orderBy(start to SortOrder.ASC).map {
-            Game(
-                it[uuid],
-                teamRepository.find(it[team1]),
-                teamRepository.find(it[team2]),
-                it[start],
-                betsByGame(it[uuid]).toMutableList()
-            )
-        }
+        Games.selectAll().orderBy(start to SortOrder.ASC).map { it.map() }
     }
 
     fun save(game: Game) {
@@ -49,14 +44,16 @@ class GameRepository(
                 it[team1] = game.team1.uuid
                 it[team2] = game.team2.uuid
                 it[start] = game.start
+                it[scoreAway] = game.score?.away
+                it[scoreHome] = game.score?.home
             }
 
             game.bets.forEach { bet ->
                 Bets.replace {
                     it[user] = bet.user
                     it[Bets.game] = game.uuid
-                    it[away] = bet.away
-                    it[home] = bet.home
+                    it[away] = bet.score.away
+                    it[home] = bet.score.home
                 }
             }
         }
@@ -64,24 +61,24 @@ class GameRepository(
 
     fun find(id: UUID): Game {
         return transaction {
-            byUuid(id).singleOrNull()?.let {
-                Game(
-                    it[uuid],
-                    teamRepository.find(it[team1]),
-                    teamRepository.find(it[team2]),
-                    it[start],
-                    betsByGame(id).toMutableList()
-                )
-            }
+            byUuid(id).singleOrNull()?.map()
         } ?: throw GameNotFoundException(id)
     }
 
+    private fun ResultRow.map() = Game(
+            this[uuid],
+            teamRepository.find(this[team1]),
+            teamRepository.find(this[team2]),
+            this[start],
+            betsByGame(this[uuid]).toMutableList(),
+            this[scoreAway]?.let { Score(it, this[scoreHome]!!) }
+    )
+
     private fun byUuid(uuid: UUID) = Games.select { Games.uuid.eq(uuid ) }
-    private fun betsByGame(uuid: UUID) = Bets.select { Bets.game.eq(uuid) }.map {
+    private fun betsByGame(uuid: UUID): List<Bet> = Bets.select { Bets.game.eq(uuid) }.map {
         Bet(
             it[Bets.user],
-            it[Bets.away],
-            it[Bets.home]
+            Score(it[Bets.away], it[Bets.home])
         )
     }
 }

@@ -36,8 +36,8 @@ export default {
     bet(newValue) {
       if (newValue === null) return
 
-      this.home = newValue.home
-      this.away = newValue.away
+      this.home = newValue.score.home
+      this.away = newValue.score.away
     }
   },
   computed: {

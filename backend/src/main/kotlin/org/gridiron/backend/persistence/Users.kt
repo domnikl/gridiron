@@ -9,6 +9,7 @@ object Users : Table(name = "users") {
     val password = varchar("password", 100)
     val isAdmin = bool("is_admin").default(false)
     val active = bool("active").default(false)
+    val score = integer("score").default(0)
 
     override val primaryKey = PrimaryKey(uuid)
 }

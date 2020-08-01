@@ -45,7 +45,7 @@
                 </template>
                 <template v-slot:item.score="{ item }">
                     <v-icon small class="mr-2" :color="betEditColor(item)" @click="startBetting(item)">mdi-scoreboard-outline</v-icon>
-                    <span v-if="getMyBet(item)">{{ getMyBet(item).away }}:{{ getMyBet(item).home }}</span>
+                    <span v-if="getMyBet(item)">{{ getMyBet(item).score.away }}:{{ getMyBet(item).score.home }}</span>
                 </template>
             </v-data-table>
         </v-card>

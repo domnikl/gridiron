@@ -8,6 +8,7 @@ import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.get
+import io.ktor.routing.patch
 import io.ktor.routing.post
 import org.gridiron.backend.model.*
 import org.joda.time.DateTime
@@ -28,7 +29,7 @@ fun Route.games(gameRepository: GameRepository, teamRepository: TeamRepository, 
             val body = call.receive<BetBody>()
             val game = gameRepository.find(UUID.fromString(call.parameters["gameId"]))
 
-            game.placeBet(user, body.away, body.home)
+            game.placeBet(user, body.score)
 
             gameRepository.save(game)
 
@@ -51,10 +52,43 @@ fun Route.games(gameRepository: GameRepository, teamRepository: TeamRepository, 
 
             call.respond(HttpStatusCode.Created, mapOf("id" to id))
         } catch (e: Exception) {
-            call.respond(HttpStatusCode.Conflict, mapOf("message" to e.message))
+            call.respond(HttpStatusCode.InternalServerError, mapOf("message" to e.message))
+        }
+    }
+
+    patch("/games/{gameId}") {
+        try {
+            val body = call.receive<PatchBody>()
+            val game = gameRepository.find(UUID.fromString(call.parameters["gameId"]))
+            val scores = game.end(body.score)
+
+            scores.forEach { (userId, score) ->
+                val user = userRepository.find(userId)
+                user.scored(score)
+                userRepository.save(user)
+            }
+
+            gameRepository.save(game)
+
+            call.respond(HttpStatusCode.OK, mapOf("scores" to scores))
+        } catch (e: UserNotFoundException) {
+            call.respond(HttpStatusCode.NotFound, mapOf("message" to e.message))
+        } catch (e: GameNotFoundException) {
+            call.respond(HttpStatusCode.NotFound, mapOf("message" to e.message))
+        } catch (e: GameAlreadyEndedException) {
+            call.respond(HttpStatusCode.PreconditionFailed, mapOf("message" to e.message))
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, mapOf("message" to e.message))
         }
     }
 }
 
 data class NewGame(val team1: UUID, val team2: UUID, val start: DateTime)
-data class BetBody(val away: Int, val home: Int)
+
+data class BetBody(val away: Int, val home: Int) {
+    val score = Score(away, home)
+}
+
+data class PatchBody(val away: Int, val home: Int) {
+    val score = Score(away, home)
+}
