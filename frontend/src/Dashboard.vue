@@ -7,7 +7,7 @@
 
             <v-data-table :loading="loading" :headers="headers" :items="users" :disable-sort="true">
                 <template v-slot:item.username="{ item }">
-                    {{ item.username }} <v-chip x-small v-if="item.uuid === currentUser.uuid" color="primary">that's you!</v-chip>
+                    {{ item.username }} <v-chip x-small v-if="item.username === currentUser.username" color="primary">that's you!</v-chip>
                 </template>
                 <template v-slot:item.score="{ item }">
                     <v-icon v-if="isGoldTrophy(item)" color="#FFDF00">mdi-trophy</v-icon>
@@ -54,9 +54,9 @@ export default {
           this.loading = false
         })
     },
-    isGoldTrophy(user) { return this.users[0] && this.users[0].uuid === user.uuid },
-    isSilverTrophy(user) { return this.users[1] && this.users[1].uuid === user.uuid },
-    isBronzeTrophy(user) { return this.users[2] && this.users[2].uuid === user.uuid },
+    isGoldTrophy(user) { return this.users[0] && this.users[0].username === user.username },
+    isSilverTrophy(user) { return this.users[1] && this.users[1].username === user.username },
+    isBronzeTrophy(user) { return this.users[2] && this.users[2].username === user.username },
   },
 };
 </script>
