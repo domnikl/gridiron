@@ -23,9 +23,15 @@
                 <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
             </v-card-title>
 
-            <v-data-table :loading="loading" :headers="headers" :items="games" :search="search">
-                <template v-slot:item.start="{ item }">
-                    {{ formatDateTimeTable(item.start) }}
+            <v-data-table
+                :loading="loading"
+                :headers="headers"
+                :items="games"
+                :search="search"
+                group-by="startDate">
+
+                <template v-slot:group.header="{ group }">
+                    <v-chip small>{{ group }}</v-chip>
                 </template>
                 <template v-slot:item.score="{ item }">
                     <v-icon v-if="$store.state.user.isAdmin" small class="mr-2" @click="gameToEnd = item">mdi-check</v-icon>
@@ -70,7 +76,7 @@ export default {
       },
       {
         text: 'start',
-        value: 'start',
+        value: 'startDateTime',
       },
       {
         text: 'your bet on score',
@@ -79,7 +85,17 @@ export default {
     ],
   }),
   computed: {
-    games() { return this.$store.state.games.filter((game) => game.score === null) },
+    games() {
+      const games = this.$store.state.games.filter((game) => game.score === null)
+
+      games.map((g) => {
+        g.startDate = moment(g.start).format('ll')
+        g.startDateTime = moment(g.start).format('lll')
+        return g
+      })
+
+      return games;
+    },
     teams() { return this.$store.state.teams },
     teams1() { return filterTeams(this.teams, this.team2); },
     teams2() { return filterTeams(this.teams, this.team1); },
@@ -156,11 +172,16 @@ export default {
         this.fetchData()
       })
     },
-    formatDateTime(e) { return moment(e).format() },
-    formatDateTimeTable(e) { return moment(e).format('lll') }
   },
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+.theme--light.v-data-table .v-row-group__header {
+    background: transparent;
+
+    span {
+        margin: 5px;
+    }
+}
 </style>
