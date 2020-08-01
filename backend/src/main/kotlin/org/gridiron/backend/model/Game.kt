@@ -23,6 +23,10 @@ data class Game(
     var score: Score? = null
 ) {
     fun placeBet(user: User, score: Score) {
+        if (start.isBeforeNow) {
+            throw GameAlreadyStartedException(this)
+        }
+
         bets.add(Bet(user.uuid, score))
     }
 
@@ -61,6 +65,9 @@ data class Game(
 }
 
 data class Bet(val user: UUID, val score: Score)
+
+class GameAlreadyStartedException(game: Game) :
+    RuntimeException("Game '${game.uuid}' already started")
 
 class GameAlreadyEndedException(game: Game) :
     RuntimeException("Game '${game.uuid}' already ended")

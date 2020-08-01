@@ -21,8 +21,6 @@ fun Route.games(gameRepository: GameRepository, teamRepository: TeamRepository, 
 
     post("/games/{gameId}/bets") {
         try {
-            // TODO: check that game hasn't started yet!
-
             val userId = call.principal<JWTPrincipal>()?.payload?.subject ?: throw UserNotFoundException(null)
             val user = userRepository.find(UUID.fromString(userId))
 
@@ -36,6 +34,8 @@ fun Route.games(gameRepository: GameRepository, teamRepository: TeamRepository, 
             call.respond(HttpStatusCode.Created)
         } catch (e: UserNotFoundException) {
             call.respond(HttpStatusCode.Unauthorized)
+        } catch (e: GameAlreadyStartedException) {
+            call.respond(HttpStatusCode.PreconditionFailed, mapOf("message" to e.message))
         }
     }
 

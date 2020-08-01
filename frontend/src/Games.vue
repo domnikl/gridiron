@@ -110,6 +110,11 @@ export default {
       })
     },
     startBetting(item) {
+      if (moment(item.start).isBefore(moment())) {
+        this.$store.commit('SET_ERROR', 'Game has already started.')
+        return;
+      }
+
       this.placeBetOn = item;
     },
     placeBet(bet) {

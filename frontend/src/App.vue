@@ -46,6 +46,10 @@
             </v-navigation-drawer>
 
             <v-main>
+                <v-alert elevation="2" border="top" v-model="showErrors" dismissible type="error">
+                    <v-row justify="center">{{ errorMessage }}</v-row>
+                </v-alert>
+
                 <v-container fluid>
                     <v-row justify="start" align="start">
                         <v-col cols="12" sm="12" md="12">
@@ -54,10 +58,6 @@
                     </v-row>
                 </v-container>
             </v-main>
-
-            <v-snackbar v-model="snackbar">
-                <v-row justify="center">{{ snackbarMessage }}</v-row>
-            </v-snackbar>
         </v-app>
     </div>
 </template>
@@ -70,17 +70,26 @@ export default {
   components: { NotLoggedIn },
   data: () => ({
     drawer: false,
-    snackbar: false,
+    showErrors: false,
+    showErrorsFor: 3000,
   }),
   watch: {
-    snackbarMessage() {
-      this.snackbar = true;
-    }
+    errorMessage(newValue) {
+      if (newValue != null) {
+        setTimeout(() => {
+          this.$store.commit('SET_ERROR', null)
+        }, this.showErrorsFor)
+
+        this.showErrors = true;
+      } else {
+        this.showErrors = false;
+      }
+    },
   },
   computed: {
     loggedInUser() { return this.$store.state.user },
     isLoggedIn() { return this.loggedInUser != null; },
-    snackbarMessage() { return this.$store.state.lastError; }
+    errorMessage() { return this.$store.state.lastError; }
   },
   methods: {
     logout() {
@@ -91,4 +100,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.v-alert {
+    margin: 5px;
+}
 </style>

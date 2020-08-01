@@ -19,11 +19,11 @@ const request = (context, config) => {
   }
 
   return client.request(config).catch((reason) => {
-    if (reason.response.status === 401) {
+    if (reason.response && reason.response.status === 401) {
       context.commit('SET_USER', null)
     }
 
-    if (reason.response.data && reason.response.data.message) {
+    if (reason.response && reason.response.data && reason.response.data.message) {
       reason = reason.response.data.message
     }
 
