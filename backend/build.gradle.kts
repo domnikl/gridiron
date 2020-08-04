@@ -4,6 +4,8 @@ plugins {
     application
     kotlin("jvm") version "1.3.72"
     id("com.github.johnrengelman.shadow") version "6.0.0"
+    id("org.jlleitschuh.gradle.ktlint") version "9.3.0"
+    id("org.jlleitschuh.gradle.ktlint-idea") version "9.3.0"
 }
 
 group = "org.gridiron"
@@ -49,9 +51,9 @@ tasks.withType<Jar> {
     archiveFileName.set("gridiron.jar")
     manifest {
         attributes(
-                mapOf(
-                        "Main-Class" to application.mainClassName
-                )
+            mapOf(
+                "Main-Class" to application.mainClassName
+            )
         )
     }
 }

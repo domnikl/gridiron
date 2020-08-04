@@ -8,9 +8,15 @@ import org.gridiron.backend.persistence.Users.password
 import org.gridiron.backend.persistence.Users.score
 import org.gridiron.backend.persistence.Users.username
 import org.gridiron.backend.persistence.Users.uuid
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.or
+import org.jetbrains.exposed.sql.replace
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.util.*
+import java.util.UUID
 
 class UserRepository(private val db: Database) {
     fun generateId(): UUID {

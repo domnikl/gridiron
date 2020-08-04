@@ -16,12 +16,14 @@ import org.gridiron.backend.model.UserRepository
 fun Route.users(userRepository: UserRepository, jwtAuthentication: JwtAuthentication) {
     authenticate {
         get("/users") {
-            call.respond(userRepository.all().map {
-                mapOf(
-                    "username" to it.username,
-                    "score" to it.score
-                )
-            })
+            call.respond(
+                userRepository.all().map {
+                    mapOf(
+                        "username" to it.username,
+                        "score" to it.score
+                    )
+                }
+            )
         }
     }
 
@@ -29,13 +31,16 @@ fun Route.users(userRepository: UserRepository, jwtAuthentication: JwtAuthentica
         val credentials = call.receive<Credentials>()
 
         userRepository.authenticate(credentials.username, credentials.password)?.let { user ->
-            call.respond(HttpStatusCode.OK, mapOf(
-                "uuid" to user.uuid,
-                "username" to user.username,
-                "email" to user.email,
-                "isAdmin" to user.isAdmin,
-                "jwt" to jwtAuthentication.create(user)
-            ))
+            call.respond(
+                HttpStatusCode.OK,
+                mapOf(
+                    "uuid" to user.uuid,
+                    "username" to user.username,
+                    "email" to user.email,
+                    "isAdmin" to user.isAdmin,
+                    "jwt" to jwtAuthentication.create(user)
+                )
+            )
 
             return@post
         }

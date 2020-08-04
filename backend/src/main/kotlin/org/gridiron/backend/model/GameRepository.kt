@@ -8,10 +8,14 @@ import org.gridiron.backend.persistence.Games.start
 import org.gridiron.backend.persistence.Games.team1
 import org.gridiron.backend.persistence.Games.team2
 import org.gridiron.backend.persistence.Games.uuid
-import org.gridiron.backend.persistence.Users
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.replace
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.util.*
+import java.util.UUID
 
 class GameRepository(
     private val db: Database,
@@ -66,15 +70,15 @@ class GameRepository(
     }
 
     private fun ResultRow.map() = Game(
-            this[uuid],
-            teamRepository.find(this[team1]),
-            teamRepository.find(this[team2]),
-            this[start],
-            betsByGame(this[uuid]).toMutableList(),
-            this[scoreAway]?.let { Score(it, this[scoreHome]!!) }
+        this[uuid],
+        teamRepository.find(this[team1]),
+        teamRepository.find(this[team2]),
+        this[start],
+        betsByGame(this[uuid]).toMutableList(),
+        this[scoreAway]?.let { Score(it, this[scoreHome]!!) }
     )
 
-    private fun byUuid(uuid: UUID) = Games.select { Games.uuid.eq(uuid ) }
+    private fun byUuid(uuid: UUID) = Games.select { Games.uuid.eq(uuid) }
     private fun betsByGame(uuid: UUID): List<Bet> = Bets.select { Bets.game.eq(uuid) }.map {
         Bet(
             it[Bets.user],

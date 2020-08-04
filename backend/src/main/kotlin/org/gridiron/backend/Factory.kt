@@ -14,9 +14,9 @@ import java.util.concurrent.TimeUnit
 class Factory(private val config: ApplicationConfig) {
     val db by lazy {
         val connection = config.propertyOrNull("db.connection")?.getString()
-                ?: throw IllegalArgumentException("'db.connection' must be configured")
+            ?: throw IllegalArgumentException("'db.connection' must be configured")
         val driver = config.propertyOrNull("db.driver")?.getString()
-                ?: throw IllegalArgumentException("'db.driver' must be configured")
+            ?: throw IllegalArgumentException("'db.driver' must be configured")
 
         val hikariConfig = HikariConfig()
         hikariConfig.jdbcUrl = connection
@@ -39,10 +39,10 @@ class Factory(private val config: ApplicationConfig) {
 
     val jwtAuthentication by lazy {
         JwtAuthentication(
-                config.property("jwt.domain").getString(),
-                config.property("jwt.audience").getString(),
-                config.property("jwt.realm").getString(),
-                config.property("jwt.secret").getString()
+            config.property("jwt.domain").getString(),
+            config.property("jwt.audience").getString(),
+            config.property("jwt.realm").getString(),
+            config.property("jwt.secret").getString()
         )
     }
 

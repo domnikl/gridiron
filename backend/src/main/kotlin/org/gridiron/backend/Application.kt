@@ -4,31 +4,33 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.joda.JodaModule
 import io.ktor.application.Application
-import io.ktor.application.call
 import io.ktor.application.install
-import io.ktor.application.log
 import io.ktor.auth.Authentication
-import io.ktor.auth.UserIdPrincipal
 import io.ktor.auth.authenticate
 import io.ktor.auth.jwt.JWTPrincipal
 import io.ktor.auth.jwt.jwt
-import io.ktor.client.features.ClientRequestException
-import io.ktor.features.*
-import io.ktor.http.*
+import io.ktor.features.CORS
+import io.ktor.features.CachingHeaders
+import io.ktor.features.CallLogging
+import io.ktor.features.Compression
+import io.ktor.features.ContentNegotiation
+import io.ktor.features.DefaultHeaders
+import io.ktor.features.StatusPages
+import io.ktor.http.CacheControl
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import io.ktor.http.content.CachingOptions
 import io.ktor.jackson.jackson
-import io.ktor.response.respond
 import io.ktor.routing.routing
-import io.ktor.sessions.Sessions
-import io.ktor.sessions.cookie
 import io.ktor.util.KtorExperimentalAPI
 import org.gridiron.backend.persistence.Bets
 import org.gridiron.backend.persistence.Games
 import org.gridiron.backend.persistence.Teams
 import org.gridiron.backend.persistence.Users
-import org.gridiron.backend.routes.users
 import org.gridiron.backend.routes.games
 import org.gridiron.backend.routes.teams
+import org.gridiron.backend.routes.users
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -68,7 +70,7 @@ fun Application.module() {
         jackson {
             registerModule(JodaModule())
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         }
     }
     install(CachingHeaders) {

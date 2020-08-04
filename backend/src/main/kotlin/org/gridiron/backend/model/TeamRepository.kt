@@ -3,9 +3,13 @@ package org.gridiron.backend.model
 import org.gridiron.backend.persistence.Teams
 import org.gridiron.backend.persistence.Teams.name
 import org.gridiron.backend.persistence.Teams.uuid
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.replace
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.util.*
+import java.util.UUID
 
 class TeamRepository(private val db: Database) {
     fun generateId(): UUID {
@@ -40,7 +44,7 @@ class TeamRepository(private val db: Database) {
         }
 
         return transaction(db) {
-            Teams.insertIgnore {
+            Teams.replace {
                 it[uuid] = team.uuid
                 it[name] = team.name
             }
@@ -55,7 +59,7 @@ class TeamRepository(private val db: Database) {
         } ?: throw TeamNotFoundException(id)
     }
 
-    private fun byUuid(uuid: UUID) = Teams.select { Teams.uuid.eq(uuid ) }
+    private fun byUuid(uuid: UUID) = Teams.select { Teams.uuid.eq(uuid) }
 }
 
 class TeamNotFoundException(uuid: UUID) :

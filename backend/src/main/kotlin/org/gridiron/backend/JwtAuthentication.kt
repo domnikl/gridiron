@@ -5,7 +5,7 @@ import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import org.gridiron.backend.model.User
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.Date
 
 class JwtAuthentication(
     val realm: String,
@@ -15,10 +15,10 @@ class JwtAuthentication(
 ) {
     private val algorithm = Algorithm.HMAC256(secret)
 
-    val verifier: JWTVerifier =  JWT.require(algorithm)
-            .withAudience(audience)
-            .withIssuer(issuer)
-            .build()
+    val verifier: JWTVerifier = JWT.require(algorithm)
+        .withAudience(audience)
+        .withIssuer(issuer)
+        .build()
 
     fun create(user: User): String {
         val expiresAt = Date().toInstant().plus(24, ChronoUnit.HOURS)

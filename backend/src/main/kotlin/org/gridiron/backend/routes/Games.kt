@@ -10,9 +10,17 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.patch
 import io.ktor.routing.post
-import org.gridiron.backend.model.*
+import org.gridiron.backend.model.Game
+import org.gridiron.backend.model.GameAlreadyEndedException
+import org.gridiron.backend.model.GameAlreadyStartedException
+import org.gridiron.backend.model.GameNotFoundException
+import org.gridiron.backend.model.GameRepository
+import org.gridiron.backend.model.Score
+import org.gridiron.backend.model.TeamRepository
+import org.gridiron.backend.model.UserNotFoundException
+import org.gridiron.backend.model.UserRepository
 import org.joda.time.DateTime
-import java.util.*
+import java.util.UUID
 
 fun Route.games(gameRepository: GameRepository, teamRepository: TeamRepository, userRepository: UserRepository) {
     get("/games") {
