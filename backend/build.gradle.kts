@@ -2,6 +2,7 @@ val ktorVersion = "1.3.2"
 
 plugins {
     application
+    java
     kotlin("jvm") version "1.3.72"
     id("com.github.johnrengelman.shadow") version "6.0.0"
     id("org.jlleitschuh.gradle.ktlint") version "9.3.0"
@@ -18,6 +19,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-jackson:$ktorVersion")
@@ -40,6 +42,13 @@ tasks {
     }
     compileTestKotlin {
         kotlinOptions.jvmTarget = "1.8"
+    }
+
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events("skipped", "failed")
+        }
     }
 }
 

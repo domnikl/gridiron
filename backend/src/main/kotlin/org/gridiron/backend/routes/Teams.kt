@@ -25,6 +25,8 @@ fun Route.teams(teamRepository: TeamRepository) {
             teamRepository.save(team)
 
             call.respond(HttpStatusCode.Created, mapOf("id" to id))
+        } catch (e: IllegalArgumentException) {
+            call.respond(HttpStatusCode.BadRequest, mapOf("message" to e.message))
         } catch (e: TeamAlreadyExistsException) {
             call.respond(HttpStatusCode.Conflict, mapOf("message" to e.message))
         }
