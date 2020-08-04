@@ -10,6 +10,7 @@ import io.ktor.routing.post
 import org.gridiron.backend.model.Team
 import org.gridiron.backend.model.TeamAlreadyExistsException
 import org.gridiron.backend.model.TeamRepository
+import org.gridiron.backend.respondException
 
 fun Route.teams(teamRepository: TeamRepository) {
     get("/teams") {
@@ -26,9 +27,9 @@ fun Route.teams(teamRepository: TeamRepository) {
 
             call.respond(HttpStatusCode.Created, mapOf("id" to id))
         } catch (e: IllegalArgumentException) {
-            call.respond(HttpStatusCode.BadRequest, mapOf("message" to e.message))
+            call.respondException(HttpStatusCode.BadRequest, e)
         } catch (e: TeamAlreadyExistsException) {
-            call.respond(HttpStatusCode.Conflict, mapOf("message" to e.message))
+            call.respondException(HttpStatusCode.Conflict, e)
         }
     }
 }

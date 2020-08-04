@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.joda.JodaModule
 import io.ktor.application.Application
+import io.ktor.application.ApplicationCall
+import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.auth.Authentication
 import io.ktor.auth.authenticate
@@ -20,8 +22,10 @@ import io.ktor.http.CacheControl
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.CachingOptions
 import io.ktor.jackson.jackson
+import io.ktor.response.respond
 import io.ktor.routing.routing
 import io.ktor.util.KtorExperimentalAPI
 import org.gridiron.backend.persistence.Bets
@@ -33,6 +37,10 @@ import org.gridiron.backend.routes.teams
 import org.gridiron.backend.routes.users
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
+
+suspend fun ApplicationCall.respondException(httpStatusCode: HttpStatusCode, e: Throwable) {
+    this.respond(httpStatusCode, mapOf("message" to e.message))
+}
 
 @KtorExperimentalAPI
 fun Application.module() {
@@ -63,7 +71,8 @@ fun Application.module() {
     install(Compression)
     install(StatusPages) {
         /*exception<Exception> { cause ->
-            call.respond(HttpStatusCode.InternalServerError, mapOf("message" to cause.message))
+            TODO("log uncaught exceptions")
+            call.respondException(HttpStatusCode.InternalServerError, cause)
         }*/
     }
     install(ContentNegotiation) {

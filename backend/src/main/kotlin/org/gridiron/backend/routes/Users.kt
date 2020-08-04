@@ -12,6 +12,8 @@ import org.gridiron.backend.JwtAuthentication
 import org.gridiron.backend.model.User
 import org.gridiron.backend.model.UserAlreadyExistsException
 import org.gridiron.backend.model.UserRepository
+import org.gridiron.backend.respondException
+import org.mindrot.jbcrypt.BCrypt
 
 fun Route.users(userRepository: UserRepository, jwtAuthentication: JwtAuthentication) {
     authenticate {
@@ -57,6 +59,7 @@ fun Route.users(userRepository: UserRepository, jwtAuthentication: JwtAuthentica
                 id,
                 newUser.username,
                 newUser.password,
+                BCrypt.gensalt(),
                 newUser.email
             )
 
@@ -67,8 +70,10 @@ fun Route.users(userRepository: UserRepository, jwtAuthentication: JwtAuthentica
             userRepository.save(user)
 
             call.respond(HttpStatusCode.Created, mapOf("id" to id))
+        } catch (e: IllegalArgumentException) {
+            call.respondException(HttpStatusCode.BadRequest, e)
         } catch (e: UserAlreadyExistsException) {
-            call.respond(HttpStatusCode.Conflict, mapOf("message" to e.message))
+            call.respondException(HttpStatusCode.Conflict, e)
         }
     }
 }

@@ -19,6 +19,7 @@ import org.gridiron.backend.model.Score
 import org.gridiron.backend.model.TeamRepository
 import org.gridiron.backend.model.UserNotFoundException
 import org.gridiron.backend.model.UserRepository
+import org.gridiron.backend.respondException
 import org.joda.time.DateTime
 import java.util.UUID
 
@@ -41,9 +42,9 @@ fun Route.games(gameRepository: GameRepository, teamRepository: TeamRepository, 
 
             call.respond(HttpStatusCode.Created)
         } catch (e: UserNotFoundException) {
-            call.respond(HttpStatusCode.Unauthorized)
+            call.respond(HttpStatusCode.Unauthorized) // TODO: this should be caught earlier in auth
         } catch (e: GameAlreadyStartedException) {
-            call.respond(HttpStatusCode.PreconditionFailed, mapOf("message" to e.message))
+            call.respondException(HttpStatusCode.PreconditionFailed, e)
         }
     }
 
@@ -60,7 +61,7 @@ fun Route.games(gameRepository: GameRepository, teamRepository: TeamRepository, 
 
             call.respond(HttpStatusCode.Created, mapOf("id" to id))
         } catch (e: Exception) {
-            call.respond(HttpStatusCode.InternalServerError, mapOf("message" to e.message))
+            call.respondException(HttpStatusCode.InternalServerError, e)
         }
     }
 
@@ -80,13 +81,13 @@ fun Route.games(gameRepository: GameRepository, teamRepository: TeamRepository, 
 
             call.respond(HttpStatusCode.OK, mapOf("scores" to scores))
         } catch (e: UserNotFoundException) {
-            call.respond(HttpStatusCode.NotFound, mapOf("message" to e.message))
+            call.respondException(HttpStatusCode.NotFound, e)
         } catch (e: GameNotFoundException) {
-            call.respond(HttpStatusCode.NotFound, mapOf("message" to e.message))
+            call.respondException(HttpStatusCode.NotFound, e)
         } catch (e: GameAlreadyEndedException) {
-            call.respond(HttpStatusCode.PreconditionFailed, mapOf("message" to e.message))
+            call.respondException(HttpStatusCode.PreconditionFailed, e)
         } catch (e: Exception) {
-            call.respond(HttpStatusCode.InternalServerError, mapOf("message" to e.message))
+            call.respondException(HttpStatusCode.InternalServerError, e)
         }
     }
 }
