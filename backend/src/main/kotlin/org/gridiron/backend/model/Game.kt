@@ -2,17 +2,6 @@ package org.gridiron.backend.model
 
 import org.joda.time.DateTime
 import java.util.UUID
-import kotlin.math.absoluteValue
-
-data class Score(val away: Int, val home: Int) {
-    val tie = away == home
-    val awayWon = away > home && !tie
-    val homeWon = home > away && !tie
-
-    operator fun minus(other: Score): Int {
-        return (away - other.away).absoluteValue + (home - other.home)
-    }
-}
 
 data class Game(
     val uuid: UUID,
