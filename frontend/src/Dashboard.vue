@@ -54,9 +54,9 @@ export default {
           this.loading = false
         })
     },
-    isGoldTrophy(user) { return this.users[0] && this.users[0].username === user.username },
-    isSilverTrophy(user) { return this.users[1] && this.users[1].username === user.username },
-    isBronzeTrophy(user) { return this.users[2] && this.users[2].username === user.username },
+    isGoldTrophy(user) { return this.users[0] && this.users[0].username === user.username && user.score > 0 },
+    isSilverTrophy(user) { return this.users[1] && this.users[1].username === user.username && user.score > 0 },
+    isBronzeTrophy(user) { return this.users[2] && this.users[2].username === user.username && user.score > 0 },
   },
 };
 </script>
