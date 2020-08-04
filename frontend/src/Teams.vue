@@ -65,7 +65,7 @@ export default {
     },
     close() {
       this.showCreate = false;
-      this.name = null;
+      this.name = '';
     },
     save() {
       this.$store.dispatch('SAVE_TEAM', {
