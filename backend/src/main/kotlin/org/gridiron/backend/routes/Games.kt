@@ -50,7 +50,7 @@ fun Route.games(gameRepository: GameRepository, teamRepository: TeamRepository, 
 
     post("/games") {
         try {
-            val newTeam = call.receive<NewGame>()
+            val newTeam = call.receive<NewGameBody>()
             val id = gameRepository.generateId()
             val team1 = teamRepository.find(newTeam.team1)
             val team2 = teamRepository.find(newTeam.team2)
@@ -92,7 +92,7 @@ fun Route.games(gameRepository: GameRepository, teamRepository: TeamRepository, 
     }
 }
 
-data class NewGame(val team1: UUID, val team2: UUID, val start: DateTime)
+data class NewGameBody(val team1: UUID, val team2: UUID, val start: DateTime)
 
 data class BetBody(val away: Int, val home: Int) {
     val score = Score(away, home)

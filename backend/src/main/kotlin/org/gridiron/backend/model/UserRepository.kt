@@ -77,13 +77,7 @@ class UserRepository(private val db: Database) {
         this[active],
         this[isAdmin]
     )
-    private fun byUuid(uuid: UUID) = Users.select { Users.uuid.eq(uuid) and Users.active.eq(true) }.singleOrNull()
+    private fun byUuid(uuid: UUID) = Users.select { Users.uuid.eq(uuid) and active.eq(true) }.singleOrNull()
 
-    private fun byUsername(username: String) = Users.select { Users.username.eq(username) and Users.active.eq(true) }.singleOrNull()
+    private fun byUsername(username: String) = Users.select { Users.username.eq(username) and active.eq(true) }.singleOrNull()
 }
-
-class UserNotFoundException(uuid: UUID?) :
-    RuntimeException("User could not be found '$uuid'")
-
-class UserAlreadyExistsException(user: User) :
-    RuntimeException("User '${user.username}' already exists")

@@ -19,7 +19,7 @@ fun Route.teams(teamRepository: TeamRepository) {
 
     post("/teams") {
         try {
-            val newTeam = call.receive<NewTeam>()
+            val newTeam = call.receive<NewTeamBody>()
             val id = teamRepository.generateId()
             val team = Team(id, newTeam.name)
 
@@ -34,4 +34,4 @@ fun Route.teams(teamRepository: TeamRepository) {
     }
 }
 
-data class NewTeam(val name: String)
+data class NewTeamBody(val name: String)

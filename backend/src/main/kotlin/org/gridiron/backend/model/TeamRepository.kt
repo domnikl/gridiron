@@ -61,9 +61,3 @@ class TeamRepository(private val db: Database) {
 
     private fun byUuid(uuid: UUID) = Teams.select { Teams.uuid.eq(uuid) }
 }
-
-class TeamNotFoundException(uuid: UUID) :
-    RuntimeException("Team could not be found '$uuid'")
-
-class TeamAlreadyExistsException(team: Team) :
-    RuntimeException("Team '${team.name}' already exists")

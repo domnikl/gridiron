@@ -79,13 +79,10 @@ class GameRepository(
     )
 
     private fun byUuid(uuid: UUID) = Games.select { Games.uuid.eq(uuid) }
-    private fun betsByGame(uuid: UUID): List<Bet> = Bets.select { Bets.game.eq(uuid) }.map {
-        Bet(
+    private fun betsByGame(uuid: UUID): List<Game.Bet> = Bets.select { Bets.game.eq(uuid) }.map {
+        Game.Bet(
             it[Bets.user],
             Score(it[Bets.away], it[Bets.home])
         )
     }
 }
-
-class GameNotFoundException(uuid: UUID) :
-    RuntimeException("Game could not be found '$uuid'")

@@ -51,12 +51,6 @@ data class Game(
             )
         }
     }
+
+    data class Bet(val user: UUID, val score: Score)
 }
-
-data class Bet(val user: UUID, val score: Score)
-
-class GameAlreadyStartedException(game: Game) :
-    RuntimeException("Game '${game.uuid}' already started")
-
-class GameAlreadyEndedException(game: Game) :
-    RuntimeException("Game '${game.uuid}' already ended")
