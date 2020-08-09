@@ -2,13 +2,17 @@ package org.gridiron.backend
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.apache.Apache
 import io.ktor.config.ApplicationConfig
 import io.ktor.util.KtorExperimentalAPI
 import org.gridiron.backend.model.GameRepository
 import org.gridiron.backend.model.TeamRepository
 import org.gridiron.backend.model.UserRepository
 import org.jetbrains.exposed.sql.Database
+import java.net.URL
 import java.util.concurrent.TimeUnit
+import java.util.logging.Logger
 
 @KtorExperimentalAPI
 class Factory(private val config: ApplicationConfig) {
@@ -49,4 +53,16 @@ class Factory(private val config: ApplicationConfig) {
     val teamRepository by lazy { TeamRepository(db) }
     val gameRepository by lazy { GameRepository(db, teamRepository) }
     val userRepository by lazy { UserRepository(db) }
+
+    val icsImporter by lazy {
+        IcsImporter(
+            IcsClient(
+                config.property("gridiron.subscribeToIcs").getList().map { URL(it) },
+                HttpClient(Apache)
+            ),
+            teamRepository,
+            gameRepository,
+            Logger.getLogger("ICSImporter")
+        )
+    }
 }

@@ -4,6 +4,7 @@ import org.gridiron.backend.persistence.Teams
 import org.gridiron.backend.persistence.Teams.name
 import org.gridiron.backend.persistence.Teams.uuid
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.replace
 import org.jetbrains.exposed.sql.select
@@ -28,7 +29,7 @@ class TeamRepository(private val db: Database) {
 
     private fun exists(team: Team): Boolean {
         return transaction {
-            Teams.select { Teams.name.eq(team.name) }.count() > 0
+            Teams.select { name.eq(team.name) }.count() > 0
         }
     }
 
@@ -54,10 +55,18 @@ class TeamRepository(private val db: Database) {
     fun find(id: UUID): Team {
         return transaction {
             byUuid(id).singleOrNull()
-        }?.let {
-            Team(it[uuid], it[name])
-        } ?: throw TeamNotFoundException(id)
+        }?.map() ?: throw TeamNotFoundException.fromUuid(id)
+    }
+
+    fun findByName(name: String): Team {
+        return transaction {
+            Teams.select { Teams.name.eq(name) }.singleOrNull()
+        }?.map() ?: throw TeamNotFoundException.fromName(name)
     }
 
     private fun byUuid(uuid: UUID) = Teams.select { Teams.uuid.eq(uuid) }
+
+    private fun ResultRow.map(): Team {
+        return Team(this[uuid], this[name])
+    }
 }

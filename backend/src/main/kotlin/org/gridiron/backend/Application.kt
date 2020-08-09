@@ -27,6 +27,11 @@ import io.ktor.jackson.jackson
 import io.ktor.response.respond
 import io.ktor.routing.routing
 import io.ktor.util.KtorExperimentalAPI
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.channels.actor
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.time.delay
 import org.gridiron.backend.persistence.Bets
 import org.gridiron.backend.persistence.Games
 import org.gridiron.backend.persistence.Teams
@@ -36,11 +41,13 @@ import org.gridiron.backend.routes.teams
 import org.gridiron.backend.routes.users
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.time.Duration
 
 suspend fun ApplicationCall.respondException(httpStatusCode: HttpStatusCode, e: Throwable) {
     this.respond(httpStatusCode, mapOf("message" to e.message))
 }
 
+@ObsoleteCoroutinesApi
 @KtorExperimentalAPI
 fun Application.module() {
     val factory = Factory(environment.config)
@@ -105,5 +112,15 @@ fun Application.module() {
             teams(factory.teamRepository)
             games(factory.gameRepository, factory.teamRepository, factory.userRepository)
         }
+    }
+
+    icsActor(factory.icsImporter)
+}
+
+@ObsoleteCoroutinesApi
+fun CoroutineScope.icsActor(icsImporter: IcsImporter) = actor<String> {
+    while(true) {
+        icsImporter.import()
+        delay(Duration.ofDays(24))
     }
 }

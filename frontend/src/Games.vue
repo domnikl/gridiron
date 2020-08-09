@@ -89,7 +89,7 @@ export default {
       const games = this.$store.state.games.filter((game) => game.score === null)
 
       games.map((g) => {
-        g.startDate = moment(g.start).format('ll')
+        g.startDate = moment(g.start).format('YYYY-MM-DD')
         g.startDateTime = moment(g.start).format('lll')
         return g
       })

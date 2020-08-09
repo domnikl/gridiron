@@ -11,10 +11,12 @@ import org.gridiron.backend.persistence.Games.uuid
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.replace
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.joda.time.DateTime
 import java.util.UUID
 
 class GameRepository(
@@ -29,6 +31,16 @@ class GameRepository(
         } while (exists(uuid))
 
         return uuid
+    }
+
+    fun exists(start: DateTime, away: Team, home: Team): Boolean {
+        return transaction {
+            Games.select {
+                Games.team1.eq(away.uuid) and
+                Games.team2.eq(home.uuid) and
+                Games.start.eq(start)
+            }.count() > 0
+        }
     }
 
     private fun exists(uuid: UUID): Boolean {
