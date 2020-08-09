@@ -42,9 +42,11 @@ export default {
       this.$store.dispatch('SIGN_UP', data).catch(() => {
         this.message = 'Please fill in all the fields.';
         this.snackbar = true;
-      }).then(() => {
-        this.message = 'Your account has been created but must be activated by an administrator.';
-        this.snackbar = true;
+      }).then((response) => {
+        if (response && response.data) {
+          this.message = 'Your account has been created but must be activated by an administrator.';
+          this.snackbar = true;
+        }
       })
     }
   }

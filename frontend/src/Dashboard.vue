@@ -1,5 +1,9 @@
 <template>
     <div>
+        <v-alert type="warning" icon="mdi-comment-question">
+            Looking for <router-link to="/games">Games</router-link> to bet on? Come back here to check your standings.
+        </v-alert>
+
         <v-card>
             <v-card-title>
                 Highscore

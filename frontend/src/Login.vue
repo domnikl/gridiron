@@ -1,7 +1,7 @@
 <template>
     <v-card class="elevation-12">
         <v-toolbar color="primary" dark flat>
-            <v-toolbar-title>Gridiron Login</v-toolbar-title>
+            <v-toolbar-title><v-icon>mdi-football</v-icon> Gridiron: Login</v-toolbar-title>
         </v-toolbar>
         <v-card-text>
             <v-form>

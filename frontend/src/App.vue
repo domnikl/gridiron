@@ -1,6 +1,14 @@
 <template>
     <div class="page-container">
-        <NotLoggedIn v-if="!isLoggedIn"></NotLoggedIn>
+        <v-app v-if="!isLoggedIn">
+            <v-main>
+                <v-alert elevation="2" border="top" v-model="showErrors" dismissible type="error">
+                    <v-row justify="center">{{ errorMessage }}</v-row>
+                </v-alert>
+
+                <NotLoggedIn></NotLoggedIn>
+            </v-main>
+        </v-app>
 
         <v-app v-if="isLoggedIn">
             <v-app-bar app clipped-right color="#1976d2" dark>

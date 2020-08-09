@@ -41,7 +41,7 @@ export default {
     }
   },
   computed: {
-    start() { return moment(this.game.start).format('lll') }
+    start() { return moment(this.game.start).tz(Intl.DateTimeFormat().resolvedOptions().timeZone).format('lll z') }
   },
   methods: {
     close() {

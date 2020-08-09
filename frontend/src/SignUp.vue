@@ -1,9 +1,13 @@
 <template>
     <v-card class="elevation-12">
         <v-toolbar color="primary" dark flat>
-            <v-toolbar-title>Gridiron register new user account</v-toolbar-title>
+            <v-toolbar-title><v-icon>mdi-football</v-icon> Gridiron: sign up for an account</v-toolbar-title>
         </v-toolbar>
         <v-card-text>
+            <v-alert type="info" border="top" elevation="2">
+                After signing up, please wait patiently while we review and activates your account.
+            </v-alert>
+
             <v-form>
                 <v-text-field label="Email" name="email" autofocus prepend-icon="mdi-email" type="email" v-model="email"></v-text-field>
                 <v-text-field label="Username" name="username" prepend-icon="mdi-account" type="text" v-model="username"></v-text-field>

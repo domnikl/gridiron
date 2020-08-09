@@ -36,8 +36,9 @@
                 <template v-slot:item.score="{ item }">
                     <v-icon v-if="$store.state.user.isAdmin" small class="mr-2" @click="gameToEnd = item">mdi-check</v-icon>
 
-                    <v-icon small class="mr-2" :color="betEditColor(item)" @click="startBetting(item)">mdi-scoreboard-outline</v-icon>
-                    <span v-if="getMyBet(item)">{{ getMyBet(item).score.away }}:{{ getMyBet(item).score.home }}</span>
+                    <v-icon v-if="getMyBet(item)" small class="mr-2" @click="startBetting(item)">mdi-scoreboard-outline</v-icon>
+                    <span v-if="getMyBet(item)">{{ String(getMyBet(item).score.away).padStart(2, '0') }}:{{ String(getMyBet(item).score.home).padStart(2, '0') }}</span>&nbsp;
+                    <v-btn color="primary" small @click="startBetting(item)">bet</v-btn>
                 </template>
             </v-data-table>
         </v-card>
@@ -67,7 +68,7 @@ export default {
     gameToEnd: null,
     headers: [
       {
-        text: 'team',
+        text: 'away',
         value: 'team1.name',
       },
       {
@@ -152,15 +153,6 @@ export default {
       }
 
       return null;
-    },
-    betEditColor(game) {
-      let color = 'error';
-
-      if (this.getMyBet(game) !== null) {
-        color = 'success'
-      }
-
-      return color;
     },
     endGame(payload) {
       this.$store.dispatch('END_GAME', {
