@@ -36,9 +36,7 @@ class GameRepository(
     fun exists(start: DateTime, away: Team, home: Team): Boolean {
         return transaction {
             Games.select {
-                Games.team1.eq(away.uuid) and
-                Games.team2.eq(home.uuid) and
-                Games.start.eq(start)
+                team1.eq(away.uuid) and team2.eq(home.uuid) and Games.start.eq(start)
             }.count() > 0
         }
     }

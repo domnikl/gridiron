@@ -119,7 +119,7 @@ fun Application.module() {
 
 @ObsoleteCoroutinesApi
 fun CoroutineScope.icsActor(icsImporter: IcsImporter) = actor<String> {
-    while(true) {
+    while (true) {
         icsImporter.import()
         delay(Duration.ofDays(24))
     }
