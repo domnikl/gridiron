@@ -1,5 +1,11 @@
 <template>
     <div>
+        <TeamFormDialog
+            :show="showCreate"
+            @close="showCreate = false"
+            @save="saveTeam">
+        </TeamFormDialog>
+
         <h1><v-icon>mdi-account-group</v-icon> Teams</h1>
 
         <v-data-iterator :items="teams" :loading="loading" :items-per-page="itemsPerPage">
@@ -15,22 +21,6 @@
             </template>
         </v-data-iterator>
 
-        <v-dialog v-model="showCreate">
-            <v-card>
-                <v-card-title class="headline">Create new team</v-card-title>
-
-                <v-card-text>
-                    <v-text-field label="Name" v-model="name" autofocus v-on:keydown.enter="save()"></v-text-field>
-                </v-card-text>
-
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn @click="close()" text>Close</v-btn>
-                    <v-btn @click="save()" text color="primary">Save</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-
         <v-btn v-if="this.$store.state.user.isAdmin" color="pink" dark fixed bottom right fab @click.stop="showCreate = true">
             <v-icon>mdi-plus</v-icon>
         </v-btn>
@@ -38,8 +28,11 @@
 </template>
 
 <script>
+import TeamFormDialog from './TeamFormDialog.vue';
+
 export default {
   name: 'Teams',
+  components: { TeamFormDialog },
   data: () => ({
     itemsPerPage: 15,
     loading: false,
@@ -63,16 +56,12 @@ export default {
         this.loading = false
       })
     },
-    close() {
-      this.showCreate = false;
-      this.name = '';
-    },
-    save() {
+    saveTeam() {
       this.$store.dispatch('SAVE_TEAM', {
         name: this.name,
       }).then(() => {
         this.fetchData()
-        this.close()
+        this.showCreate = false
       })
     },
   },
