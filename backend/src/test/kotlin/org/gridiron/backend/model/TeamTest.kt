@@ -9,11 +9,11 @@ class TeamTest {
     @Test
     fun `can not be created without a name`() {
         assertThrows<IllegalArgumentException> {
-            Team(UUID.randomUUID(), "")
+            Team(UUID.randomUUID(), "", null)
         }
 
         assertThrows<IllegalArgumentException> {
-            Team(UUID.randomUUID(), "KR")
+            Team(UUID.randomUUID(), "KR", null)
         }
     }
 
@@ -22,12 +22,12 @@ class TeamTest {
         val name = "".padEnd(101, 'a')
 
         assertThrows<IllegalArgumentException> {
-            Team(UUID.randomUUID(), name)
+            Team(UUID.randomUUID(), name, null)
         }
     }
 
     @Test
     fun `can get name`() {
-        assertEquals("Foobar football team", Team(UUID.randomUUID(), "Foobar football team").name)
+        assertEquals("Foobar football team", Team(UUID.randomUUID(), "Foobar football team", null).name)
     }
 }

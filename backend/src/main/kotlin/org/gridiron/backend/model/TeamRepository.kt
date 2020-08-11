@@ -1,6 +1,7 @@
 package org.gridiron.backend.model
 
 import org.gridiron.backend.persistence.Teams
+import org.gridiron.backend.persistence.Teams.logo
 import org.gridiron.backend.persistence.Teams.name
 import org.gridiron.backend.persistence.Teams.uuid
 import org.jetbrains.exposed.sql.Database
@@ -11,6 +12,7 @@ import org.jetbrains.exposed.sql.not
 import org.jetbrains.exposed.sql.replace
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.UUID
 
@@ -36,9 +38,7 @@ class TeamRepository(private val db: Database) {
     }
 
     fun all() = transaction(db) {
-        Teams.selectAll().orderBy(name to SortOrder.ASC).map {
-            Team(it[uuid], it[name])
-        }
+        Teams.selectAll().orderBy(name to SortOrder.ASC).map { it.map() }
     }
 
     fun save(team: Team) {
@@ -50,6 +50,10 @@ class TeamRepository(private val db: Database) {
             Teams.replace {
                 it[uuid] = team.uuid
                 it[name] = team.name
+
+                if (team.logo != null) { // don't overwrite if not given
+                    it[logo] = ExposedBlob(team.logo)
+                }
             }
         }
     }
@@ -69,6 +73,6 @@ class TeamRepository(private val db: Database) {
     private fun byUuid(uuid: UUID) = Teams.select { Teams.uuid.eq(uuid) }
 
     private fun ResultRow.map(): Team {
-        return Team(this[uuid], this[name])
+        return Team(this[uuid], this[name], this[logo]?.bytes)
     }
 }

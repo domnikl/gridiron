@@ -23,7 +23,7 @@ fun Route.teams(teamRepository: TeamRepository) {
         try {
             val newTeam = call.receive<TeamBody>()
             val id = UUID.fromString(call.parameters["teamId"])
-            val team = Team(id, newTeam.name)
+            val team = Team(id, newTeam.name, newTeam.logo)
 
             teamRepository.save(team)
 
@@ -39,7 +39,7 @@ fun Route.teams(teamRepository: TeamRepository) {
         try {
             val newTeam = call.receive<TeamBody>()
             val id = teamRepository.generateId()
-            val team = Team(id, newTeam.name)
+            val team = Team(id, newTeam.name, newTeam.logo)
 
             teamRepository.save(team)
 
@@ -52,4 +52,4 @@ fun Route.teams(teamRepository: TeamRepository) {
     }
 }
 
-data class TeamBody(val name: String)
+data class TeamBody(val name: String, val logo: ByteArray?)

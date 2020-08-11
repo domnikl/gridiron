@@ -31,6 +31,18 @@ const request = (context, config) => {
   })
 }
 
+const nullableFileInput = (file) => {
+  if (!file) {
+    return Promise.resolve(null)
+  }
+
+  return new Promise((resolve) => {
+    const fileReader = new FileReader()
+    fileReader.onload = resolve
+    fileReader.readAsBinaryString(file)
+  })
+}
+
 const store = new Vuex.Store({
   state: {
     lastError: '',
@@ -81,15 +93,23 @@ const store = new Vuex.Store({
       return request(context, { method: 'PATCH', url: `/games/${payload.game.uuid}`, data: payload })
     },
     SAVE_TEAM(context, payload) {
-      let promise;
+      async function f1() {
+        const result = await nullableFileInput(payload.logo)
 
-      if (payload.uuid) {
-        promise = request(context, { method: 'PATCH', url: `/teams/${payload.uuid}`, data: payload })
-      } else {
-        promise = request(context, { method: 'POST', url: '/teams', data: payload })
+        payload.logo = result && result.target ? btoa(result.target.result) : null
+
+        let promise;
+
+        if (payload.uuid) {
+          promise = request(context, { method: 'PATCH', url: `/teams/${payload.uuid}`, data: payload })
+        } else {
+          promise = request(context, { method: 'POST', url: '/teams', data: payload })
+        }
+
+        return promise
       }
 
-      return promise
+      return f1()
     },
     LOGIN(context, payload) {
       return request(context, { method: 'POST', url: '/auth', data: payload })

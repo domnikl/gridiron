@@ -33,6 +33,19 @@
                 <template v-slot:group.header="{ group }">
                     <v-chip small>{{ group }}</v-chip>
                 </template>
+
+                <template v-slot:item.away="{ item }">
+                    <div class="team-name" :style="logoDataUrl(item.team1)">
+                        <div>{{ item.team1.name }}</div>
+                    </div>
+                </template>
+
+                <template v-slot:item.home="{ item }">
+                    <div class="team-name" :style="logoDataUrl(item.team2)">
+                        <div>{{ item.team2.name }}</div>
+                    </div>
+                </template>
+
                 <template v-slot:item.score="{ item }">
                     <v-icon v-if="$store.state.user.isAdmin" small class="mr-2" @click="gameToEnd = item">mdi-check</v-icon>
 
@@ -69,11 +82,11 @@ export default {
     headers: [
       {
         text: 'away',
-        value: 'team1.name',
+        value: 'away',
       },
       {
         text: 'at',
-        value: 'team2.name',
+        value: 'home',
       },
       {
         text: 'start',
@@ -164,6 +177,9 @@ export default {
         this.fetchData()
       })
     },
+    logoDataUrl(team) {
+      return team.logo ? `background-image: url(data:image/png;base64,${team.logo});` : null
+    }
   },
 };
 </script>
@@ -174,6 +190,17 @@ export default {
 
     span {
         margin: 5px;
+    }
+}
+
+.team-name {
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 100%;
+
+    div {
+        background-color: #ffffffaa;
+        padding: 20px;
     }
 }
 </style>

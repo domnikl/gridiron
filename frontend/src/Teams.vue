@@ -12,9 +12,11 @@
             <template v-slot:default="props">
                 <v-row>
                     <v-col v-for="item in props.items" :key="item.uuid" cols="12" sm="6" md="4" lg="3">
-                        <v-card>
-                            <v-card-title class="subheading font-weight-bold">{{ item.name }}</v-card-title>
-                            <v-card-subtitle>Football team</v-card-subtitle>
+                        <v-card max-width="400px">
+                            <v-img :src="logoDataUrl(item)" height="200px" contain>
+                                <v-card-title class="subheading font-weight-bold">{{ item.name }}</v-card-title>
+                            </v-img>
+                            <!--<v-card-subtitle>Football team</v-card-subtitle>-->
                             <v-card-actions>
                                 <v-spacer></v-spacer>
                                 <v-btn v-if="$store.state.user.isAdmin" icon color="primary" @click.stop="edit = item">
@@ -65,14 +67,21 @@ export default {
       this.$store.dispatch('SAVE_TEAM', {
         uuid: team.uuid,
         name: team.name,
+        logo: team.logo,
       }).then(() => {
         this.fetchData()
         this.edit = null
       })
     },
+    logoDataUrl(team) {
+      return team.logo ? `data:image/png;base64,${team.logo}` : null
+    }
   },
 };
 </script>
 
 <style lang="scss" scoped>
+.subheading {
+    background-color: #ffffffcc;
+}
 </style>
