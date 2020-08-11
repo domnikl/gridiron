@@ -81,7 +81,15 @@ const store = new Vuex.Store({
       return request(context, { method: 'PATCH', url: `/games/${payload.game.uuid}`, data: payload })
     },
     SAVE_TEAM(context, payload) {
-      return request(context, { method: 'POST', url: '/teams', data: payload })
+      let promise;
+
+      if (payload.uuid) {
+        promise = request(context, { method: 'PATCH', url: `/teams/${payload.uuid}`, data: payload })
+      } else {
+        promise = request(context, { method: 'POST', url: '/teams', data: payload })
+      }
+
+      return promise
     },
     LOGIN(context, payload) {
       return request(context, { method: 'POST', url: '/auth', data: payload })

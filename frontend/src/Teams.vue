@@ -1,8 +1,8 @@
 <template>
     <div>
         <TeamFormDialog
-            :show="showCreate"
-            @close="showCreate = false"
+            :team="edit"
+            @close="edit = null"
             @save="saveTeam">
         </TeamFormDialog>
 
@@ -15,13 +15,19 @@
                         <v-card>
                             <v-card-title class="subheading font-weight-bold">{{ item.name }}</v-card-title>
                             <v-card-subtitle>Football team</v-card-subtitle>
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn v-if="$store.state.user.isAdmin" icon color="primary" @click.stop="edit = item">
+                                    <v-icon>mdi-pencil</v-icon>
+                                </v-btn>
+                            </v-card-actions>
                         </v-card>
                     </v-col>
                 </v-row>
             </template>
         </v-data-iterator>
 
-        <v-btn v-if="this.$store.state.user.isAdmin" color="pink" dark fixed bottom right fab @click.stop="showCreate = true">
+        <v-btn v-if="this.$store.state.user.isAdmin" color="pink" dark fixed bottom right fab @click.stop="edit = {}">
             <v-icon>mdi-plus</v-icon>
         </v-btn>
     </div>
@@ -37,8 +43,7 @@ export default {
     itemsPerPage: 15,
     loading: false,
     error: null,
-    showCreate: false,
-    name: '',
+    edit: null,
   }),
   computed: {
     teams() { return this.$store.state.teams }
@@ -56,12 +61,13 @@ export default {
         this.loading = false
       })
     },
-    saveTeam() {
+    saveTeam(team) {
       this.$store.dispatch('SAVE_TEAM', {
-        name: this.name,
+        uuid: team.uuid,
+        name: team.name,
       }).then(() => {
         this.fetchData()
-        this.showCreate = false
+        this.edit = null
       })
     },
   },

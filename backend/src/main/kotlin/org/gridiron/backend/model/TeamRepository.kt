@@ -6,6 +6,8 @@ import org.gridiron.backend.persistence.Teams.uuid
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.not
 import org.jetbrains.exposed.sql.replace
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
@@ -29,7 +31,7 @@ class TeamRepository(private val db: Database) {
 
     private fun exists(team: Team): Boolean {
         return transaction {
-            Teams.select { name.eq(team.name) }.count() > 0
+            Teams.select { name.eq(team.name) and not(uuid.eq(team.uuid)) }.count() > 0
         }
     }
 

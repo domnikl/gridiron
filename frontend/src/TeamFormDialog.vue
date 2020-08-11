@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-dialog :value="show" v-if="!!show" @click:outside="close()" @keydown.esc="close()">
+        <v-dialog :value="!!team" @click:outside="close()" @keydown.esc="close()">
             <v-card>
                 <v-card-title class="headline">Create new team</v-card-title>
 
@@ -21,10 +21,15 @@
 <script>
 export default {
   name: 'TeamFormDialog',
-  props: ['show'],
+  props: ['team'],
   data: () => ({
     name: null,
   }),
+  watch: {
+    team(newValue) {
+      if (newValue.name) this.name = newValue.name
+    }
+  },
   methods: {
     close() {
       this.name = null
@@ -32,8 +37,10 @@ export default {
     },
     save() {
       this.$emit('save', {
+        uuid: this.team.uuid,
         name: this.name,
       })
+      this.name = null
     },
   },
 };
