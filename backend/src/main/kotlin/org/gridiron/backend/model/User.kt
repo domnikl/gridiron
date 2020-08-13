@@ -9,7 +9,6 @@ data class User(
     val password: String,
     val email: String,
     var score: Int,
-    val isActive: Boolean = false,
     val roles: Set<Role> = emptySet()
 ) {
     init {
@@ -42,9 +41,7 @@ data class User(
                 username,
                 BCrypt.hashpw(password, salt),
                 email,
-                0,
-                false,
-                setOf(Role.USER)
+                0
             )
         }
     }

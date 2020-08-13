@@ -130,10 +130,8 @@ fun Application.module() {
         users(factory.userRepository, jwtAuthentication)
 
         authenticate {
-            rolesAllowed(User.Role.USER) {
-                teams(factory.teamRepository)
-                games(factory.gameRepository, factory.teamRepository, factory.userRepository)
-            }
+            teams(factory.teamRepository)
+            games(factory.gameRepository, factory.teamRepository, factory.userRepository)
         }
     }
 

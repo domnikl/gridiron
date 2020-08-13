@@ -7,8 +7,7 @@ object Users : Table(name = "users") {
     val email = varchar("email", 180).uniqueIndex()
     val username = varchar("login", 70).uniqueIndex()
     val password = varchar("password", 100)
-    val isAdmin = bool("is_admin").default(false)
-    val active = bool("active").default(false)
+    val roles = varchar("roles", 255).default("")
     val score = integer("score").default(0)
 
     override val primaryKey = PrimaryKey(uuid)
