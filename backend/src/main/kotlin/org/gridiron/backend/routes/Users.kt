@@ -8,24 +8,29 @@ import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
+import io.ktor.util.KtorExperimentalAPI
 import org.gridiron.backend.JwtAuthentication
+import org.gridiron.backend.ktor.rolesAllowed
 import org.gridiron.backend.model.User
 import org.gridiron.backend.model.UserAlreadyExistsException
 import org.gridiron.backend.model.UserRepository
 import org.gridiron.backend.respondException
 import org.mindrot.jbcrypt.BCrypt
 
+@KtorExperimentalAPI
 fun Route.users(userRepository: UserRepository, jwtAuthentication: JwtAuthentication) {
     authenticate {
-        get("/users") {
-            call.respond(
-                userRepository.all().map {
-                    mapOf(
-                        "username" to it.username,
-                        "score" to it.score
-                    )
-                }
-            )
+        rolesAllowed(User.Role.USER) {
+            get("/users") {
+                call.respond(
+                    userRepository.all().map {
+                        mapOf(
+                            "username" to it.username,
+                            "score" to it.score
+                        )
+                    }
+                )
+            }
         }
     }
 
@@ -39,7 +44,7 @@ fun Route.users(userRepository: UserRepository, jwtAuthentication: JwtAuthentica
                     "uuid" to user.uuid,
                     "username" to user.username,
                     "email" to user.email,
-                    "isAdmin" to user.isAdmin,
+                    "isAdmin" to (User.Role.ADMIN in user.roles),
                     "jwt" to jwtAuthentication.create(user)
                 )
             )

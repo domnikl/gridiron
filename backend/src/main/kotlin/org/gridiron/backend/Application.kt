@@ -10,6 +10,7 @@ import io.ktor.auth.Authentication
 import io.ktor.auth.authenticate
 import io.ktor.auth.jwt.JWTPrincipal
 import io.ktor.auth.jwt.jwt
+import io.ktor.auth.principal
 import io.ktor.features.CORS
 import io.ktor.features.CachingHeaders
 import io.ktor.features.CallLogging
@@ -30,8 +31,10 @@ import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.actor
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.time.delay
+import org.gridiron.backend.ktor.RoleAuthorization
+import org.gridiron.backend.ktor.rolesAllowed
+import org.gridiron.backend.model.User
 import org.gridiron.backend.persistence.Bets
 import org.gridiron.backend.persistence.Games
 import org.gridiron.backend.persistence.Teams
@@ -41,7 +44,9 @@ import org.gridiron.backend.routes.teams
 import org.gridiron.backend.routes.users
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.slf4j.LoggerFactory
 import java.time.Duration
+import java.util.UUID
 
 suspend fun ApplicationCall.respondException(httpStatusCode: HttpStatusCode, e: Throwable) {
     this.respond(httpStatusCode, mapOf("message" to e.message))
@@ -100,8 +105,24 @@ fun Application.module() {
     install(Authentication) {
         jwt {
             realm = jwtAuthentication.realm
-            verifier(jwtAuthentication.verifier)
-            validate { JWTPrincipal(it.payload) }
+            verifier { jwtAuthentication.verifier }
+            validate {
+                JWTPrincipal(it.payload)
+            }
+        }
+    }
+    install(RoleAuthorization) {
+        validate { allowedRoles ->
+            try {
+                val userId = principal<JWTPrincipal>()?.payload?.subject ?: return@validate false
+                val user = factory.userRepository.find(UUID.fromString(userId))
+
+                return@validate allowedRoles.any { role -> role in user.roles }
+            } catch (e: Exception) {
+                LoggerFactory.getLogger("RoleAuthorization").info("Authorization failed: ${e.message}", e)
+
+                return@validate false
+            }
         }
     }
 
@@ -109,8 +130,10 @@ fun Application.module() {
         users(factory.userRepository, jwtAuthentication)
 
         authenticate {
-            teams(factory.teamRepository)
-            games(factory.gameRepository, factory.teamRepository, factory.userRepository)
+            rolesAllowed(User.Role.USER) {
+                teams(factory.teamRepository)
+                games(factory.gameRepository, factory.teamRepository, factory.userRepository)
+            }
         }
     }
 

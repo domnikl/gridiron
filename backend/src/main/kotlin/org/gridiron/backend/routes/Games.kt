@@ -10,6 +10,8 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.patch
 import io.ktor.routing.post
+import io.ktor.util.KtorExperimentalAPI
+import org.gridiron.backend.ktor.rolesAllowed
 import org.gridiron.backend.model.Game
 import org.gridiron.backend.model.GameAlreadyEndedException
 import org.gridiron.backend.model.GameAlreadyStartedException
@@ -17,12 +19,14 @@ import org.gridiron.backend.model.GameNotFoundException
 import org.gridiron.backend.model.GameRepository
 import org.gridiron.backend.model.Score
 import org.gridiron.backend.model.TeamRepository
+import org.gridiron.backend.model.User
 import org.gridiron.backend.model.UserNotFoundException
 import org.gridiron.backend.model.UserRepository
 import org.gridiron.backend.respondException
 import org.joda.time.DateTime
 import java.util.UUID
 
+@KtorExperimentalAPI
 fun Route.games(gameRepository: GameRepository, teamRepository: TeamRepository, userRepository: UserRepository) {
     get("/games") {
         call.respond(gameRepository.all())
@@ -41,53 +45,53 @@ fun Route.games(gameRepository: GameRepository, teamRepository: TeamRepository, 
             gameRepository.save(game)
 
             call.respond(HttpStatusCode.Created)
-        } catch (e: UserNotFoundException) {
-            call.respond(HttpStatusCode.Unauthorized) // TODO: this should be caught earlier in auth
         } catch (e: GameAlreadyStartedException) {
             call.respondException(HttpStatusCode.PreconditionFailed, e)
         }
     }
 
-    post("/games") {
-        try {
-            val newTeam = call.receive<NewGameBody>()
-            val id = gameRepository.generateId()
-            val team1 = teamRepository.find(newTeam.team1)
-            val team2 = teamRepository.find(newTeam.team2)
+    rolesAllowed(User.Role.ADMIN) {
+        post("/games") {
+            try {
+                val newGame = call.receive<NewGameBody>()
+                val id = gameRepository.generateId()
+                val team1 = teamRepository.find(newGame.team1)
+                val team2 = teamRepository.find(newGame.team2)
 
-            val game = Game.create(id, team1, team2, newTeam.start)
+                val game = Game.create(id, team1, team2, newGame.start)
 
-            gameRepository.save(game)
+                gameRepository.save(game)
 
-            call.respond(HttpStatusCode.Created, mapOf("id" to id))
-        } catch (e: Exception) {
-            call.respondException(HttpStatusCode.InternalServerError, e)
-        }
-    }
-
-    patch("/games/{gameId}") {
-        try {
-            val body = call.receive<PatchBody>()
-            val game = gameRepository.find(UUID.fromString(call.parameters["gameId"]))
-            val scores = game.end(body.score)
-
-            scores.forEach { (userId, score) ->
-                val user = userRepository.find(userId)
-                user.scored(score)
-                userRepository.save(user)
+                call.respond(HttpStatusCode.Created, mapOf("id" to id))
+            } catch (e: Exception) {
+                call.respondException(HttpStatusCode.InternalServerError, e)
             }
+        }
 
-            gameRepository.save(game)
+        patch("/games/{gameId}") {
+            try {
+                val body = call.receive<PatchBody>()
+                val game = gameRepository.find(UUID.fromString(call.parameters["gameId"]))
+                val scores = game.end(body.score)
 
-            call.respond(HttpStatusCode.OK, mapOf("scores" to scores))
-        } catch (e: UserNotFoundException) {
-            call.respondException(HttpStatusCode.NotFound, e)
-        } catch (e: GameNotFoundException) {
-            call.respondException(HttpStatusCode.NotFound, e)
-        } catch (e: GameAlreadyEndedException) {
-            call.respondException(HttpStatusCode.PreconditionFailed, e)
-        } catch (e: Exception) {
-            call.respondException(HttpStatusCode.InternalServerError, e)
+                scores.forEach { (userId, score) ->
+                    val user = userRepository.find(userId)
+                    user.scored(score)
+                    userRepository.save(user)
+                }
+
+                gameRepository.save(game)
+
+                call.respond(HttpStatusCode.OK, mapOf("scores" to scores))
+            } catch (e: UserNotFoundException) {
+                call.respondException(HttpStatusCode.NotFound, e)
+            } catch (e: GameNotFoundException) {
+                call.respondException(HttpStatusCode.NotFound, e)
+            } catch (e: GameAlreadyEndedException) {
+                call.respondException(HttpStatusCode.PreconditionFailed, e)
+            } catch (e: Exception) {
+                call.respondException(HttpStatusCode.InternalServerError, e)
+            }
         }
     }
 }

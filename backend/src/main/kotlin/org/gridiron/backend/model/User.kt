@@ -10,7 +10,7 @@ data class User(
     val email: String,
     var score: Int,
     val isActive: Boolean = false,
-    val isAdmin: Boolean = false
+    val roles: Set<Role> = emptySet()
 ) {
     init {
         require(username.length >= 3) { "Username must not be shorter than 3 chars" }
@@ -42,8 +42,15 @@ data class User(
                 username,
                 BCrypt.hashpw(password, salt),
                 email,
-                0
+                0,
+                false,
+                setOf(Role.USER)
             )
         }
+    }
+
+    enum class Role {
+        USER,
+        ADMIN
     }
 }

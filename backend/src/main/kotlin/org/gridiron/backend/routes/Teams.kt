@@ -8,46 +8,52 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.patch
 import io.ktor.routing.post
+import io.ktor.util.KtorExperimentalAPI
+import org.gridiron.backend.ktor.rolesAllowed
 import org.gridiron.backend.model.Team
 import org.gridiron.backend.model.TeamAlreadyExistsException
 import org.gridiron.backend.model.TeamRepository
+import org.gridiron.backend.model.User
 import org.gridiron.backend.respondException
 import java.util.UUID
 
+@KtorExperimentalAPI
 fun Route.teams(teamRepository: TeamRepository) {
     get("/teams") {
         call.respond(teamRepository.all())
     }
 
-    patch("/teams/{teamId}") {
-        try {
-            val newTeam = call.receive<TeamBody>()
-            val id = UUID.fromString(call.parameters["teamId"])
-            val team = Team(id, newTeam.name, newTeam.logo)
+    rolesAllowed(User.Role.ADMIN) {
+        patch("/teams/{teamId}") {
+            try {
+                val newTeam = call.receive<TeamBody>()
+                val id = UUID.fromString(call.parameters["teamId"])
+                val team = Team(id, newTeam.name, newTeam.logo)
 
-            teamRepository.save(team)
+                teamRepository.save(team)
 
-            call.respond(HttpStatusCode.NoContent)
-        } catch (e: IllegalArgumentException) {
-            call.respondException(HttpStatusCode.BadRequest, e)
-        } catch (e: TeamAlreadyExistsException) {
-            call.respondException(HttpStatusCode.Conflict, e)
+                call.respond(HttpStatusCode.NoContent)
+            } catch (e: IllegalArgumentException) {
+                call.respondException(HttpStatusCode.BadRequest, e)
+            } catch (e: TeamAlreadyExistsException) {
+                call.respondException(HttpStatusCode.Conflict, e)
+            }
         }
-    }
 
-    post("/teams") {
-        try {
-            val newTeam = call.receive<TeamBody>()
-            val id = teamRepository.generateId()
-            val team = Team(id, newTeam.name, newTeam.logo)
+        post("/teams") {
+            try {
+                val newTeam = call.receive<TeamBody>()
+                val id = teamRepository.generateId()
+                val team = Team(id, newTeam.name, newTeam.logo)
 
-            teamRepository.save(team)
+                teamRepository.save(team)
 
-            call.respond(HttpStatusCode.Created, mapOf("id" to id))
-        } catch (e: IllegalArgumentException) {
-            call.respondException(HttpStatusCode.BadRequest, e)
-        } catch (e: TeamAlreadyExistsException) {
-            call.respondException(HttpStatusCode.Conflict, e)
+                call.respond(HttpStatusCode.Created, mapOf("id" to id))
+            } catch (e: IllegalArgumentException) {
+                call.respondException(HttpStatusCode.BadRequest, e)
+            } catch (e: TeamAlreadyExistsException) {
+                call.respondException(HttpStatusCode.Conflict, e)
+            }
         }
     }
 }

@@ -75,7 +75,7 @@ class UserRepository(private val db: Database) {
         this[email],
         this[score],
         this[active],
-        this[isAdmin]
+        if (this[isAdmin]) setOf(User.Role.USER, User.Role.ADMIN) else setOf(User.Role.USER)
     )
     private fun byUuid(uuid: UUID) = Users.select { Users.uuid.eq(uuid) and active.eq(true) }.singleOrNull()
 
