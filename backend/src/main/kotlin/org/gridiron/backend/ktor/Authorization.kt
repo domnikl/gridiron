@@ -19,7 +19,6 @@ import io.ktor.util.pipeline.PipelinePhase
 import org.gridiron.backend.model.User
 import org.slf4j.LoggerFactory
 
-
 class RoleBasedAuthorizer {
     lateinit var authorizationFunction: suspend ApplicationCall.(Set<User.Role>) -> Boolean
 
@@ -32,7 +31,7 @@ class RoleAuthorization(config: Configuration) {
     private val log = LoggerFactory.getLogger(RoleAuthorization::class.java)
     private val config = config.copy()
 
-    constructor(provider: RoleBasedAuthorizer): this(Configuration(provider))
+    constructor(provider: RoleBasedAuthorizer) : this(Configuration(provider))
 
     @KtorExperimentalAPI
     fun interceptPipeline(pipeline: ApplicationCallPipeline, roles: Set<User.Role>) {

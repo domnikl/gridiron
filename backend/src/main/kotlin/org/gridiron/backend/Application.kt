@@ -33,8 +33,6 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.time.delay
 import org.gridiron.backend.ktor.RoleAuthorization
-import org.gridiron.backend.ktor.rolesAllowed
-import org.gridiron.backend.model.User
 import org.gridiron.backend.persistence.Bets
 import org.gridiron.backend.persistence.Games
 import org.gridiron.backend.persistence.Teams
