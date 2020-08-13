@@ -32,7 +32,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jodatime:0.26.1")
     implementation("org.jetbrains.exposed:exposed-java-time:0.26.1")
     implementation("com.zaxxer:HikariCP:3.4.5")
-    implementation("org.slf4j:slf4j-simple:1.7.30")
+    implementation("ch.qos.logback:logback-classic:1.2.3")
     implementation("org.mindrot:jbcrypt:0.4")
     implementation("io.ktor:ktor-client-apache:$ktorVersion")
     implementation("org.mnode.ical4j:ical4j:3.0.19")
