@@ -4,7 +4,7 @@ Gridiron is an American Football bet system that lets you bet on final scores of
 
 ## project structure
 
-The project is built with a Kotlin + Ktor powered [backend](https://github.com/domnikl/gridiron/tree/master/backend) using MariaDB as persistent storage. On top sits a Single Page Application built with VueJS residing in [frontend](https://github.com/domnikl/gridiron/tree/master/frontend).
+The project is built with a Kotlin + Ktor powered [backend](https://github.com/domnikl/gridiron/tree/master/backend) using MySQL as persistent storage. On top sits a Single Page Application built with VueJS residing in [frontend](https://github.com/domnikl/gridiron/tree/master/frontend).
 
 ## building
 
