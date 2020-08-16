@@ -10,7 +10,6 @@ import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.util.KtorExperimentalAPI
 import org.gridiron.backend.JwtAuthentication
-import org.gridiron.backend.ktor.rolesAllowed
 import org.gridiron.backend.model.User
 import org.gridiron.backend.model.UserAlreadyExistsException
 import org.gridiron.backend.model.UserRepository
@@ -20,17 +19,15 @@ import org.mindrot.jbcrypt.BCrypt
 @KtorExperimentalAPI
 fun Route.users(userRepository: UserRepository, jwtAuthentication: JwtAuthentication) {
     authenticate {
-        rolesAllowed(User.Role.USER) {
-            get("/users") {
-                call.respond(
-                    userRepository.all().map {
-                        mapOf(
-                            "username" to it.username,
-                            "score" to it.score
-                        )
-                    }
-                )
-            }
+        get("/users") {
+            call.respond(
+                userRepository.all().map {
+                    mapOf(
+                        "username" to it.username,
+                        "score" to it.score
+                    )
+                }
+            )
         }
     }
 
