@@ -68,8 +68,6 @@ import CreateGameDialog from './CreateGameDialog.vue';
 import PlaceBetDialog from './PlaceBetDialog.vue';
 import EndGameDialog from './EndGameDialog.vue';
 
-const filterTeams = (teams, selected) => teams.filter((e) => selected === null || e.uuid !== selected)
-
 export default {
   name: 'Games',
   components: { CreateGameDialog, PlaceBetDialog, EndGameDialog },
@@ -102,17 +100,15 @@ export default {
     games() {
       const games = this.$store.state.games.filter((game) => game.score === null)
 
-      games.map((g) => {
+      return games.map((g) => {
         g.startDate = moment(g.start).format('YYYY-MM-DD')
         g.startDateTime = moment(g.start).format('lll')
+        g.home = g.team1.name // make home searchable
+        g.away = g.team2.name
         return g
       })
-
-      return games;
     },
     teams() { return this.$store.state.teams },
-    teams1() { return filterTeams(this.teams, this.team2); },
-    teams2() { return filterTeams(this.teams, this.team1); },
   },
   created() {
     this.fetchData();
