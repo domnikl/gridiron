@@ -16,16 +16,25 @@
                 <v-toolbar-title>Gridiron</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-toolbar-title>
-                    <v-icon color="grey">mdi-account</v-icon>{{ loggedInUser.username }}
+                    <v-icon color="white">mdi-account</v-icon>{{ loggedInUser.username }}
 
-                    <v-btn text x-small @click="logout">
+                    <v-btn small @click="logout" color="white">
                         <v-icon small color="red">mdi-logout</v-icon>
                     </v-btn>
                 </v-toolbar-title>
             </v-app-bar>
 
             <v-navigation-drawer v-model="drawer" app>
-                <v-list dense>
+                <v-list>
+                    <v-list-item>
+                        <v-list-item-title class="title">
+                            Gridiron
+                        </v-list-item-title>
+                        <v-list-item-subtitle>
+                            Bet with your friends.
+                        </v-list-item-subtitle>
+                    </v-list-item>
+
                     <v-list-item to="/">
                         <v-list-item-action>
                             <v-icon>mdi-view-dashboard-outline</v-icon>
@@ -51,6 +60,10 @@
                         </v-list-item-content>
                     </v-list-item>
                 </v-list>
+
+                <div class="pa-2 logout-nav-bar">
+                    <v-btn block color="error">Logout</v-btn>
+                </div>
             </v-navigation-drawer>
 
             <v-main>
@@ -108,6 +121,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.logout-nav-bar {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
 .v-alert {
     margin: 5px;
 }
