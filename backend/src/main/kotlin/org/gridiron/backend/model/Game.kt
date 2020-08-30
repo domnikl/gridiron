@@ -26,12 +26,13 @@ data class Game(
 
         this.score = score
 
-        val withLowestDiff = bets.map { it.user to it.score - score }.minBy { it.second }
+        val lowestDiff = bets.map { it.score - score }.min()
+        val betsWithLowestDiff = bets.filter { it.score - score == lowestDiff }
 
         return bets.map {
             it.user to when {
                 this.score == it.score -> 12
-                it.user == withLowestDiff?.first -> 6
+                it in betsWithLowestDiff -> 6
                 this.score!!.tie == it.score.tie -> 3
                 this.score!!.awayWon == it.score.awayWon -> 3
                 this.score!!.homeWon == it.score.homeWon -> 3
