@@ -42,6 +42,7 @@ class UserRepository(private val db: Database) {
                 it[username] = user.username
                 it[password] = user.password
                 it[score] = user.score
+                it[roles] = user.roles.joinToString(", ")
             }
         }
     }
